@@ -1,0 +1,101 @@
+{
+  "top_k": 1,
+  "evaluated": 8,
+  "hits": 7,
+  "hit_rate": 0.875,
+  "skipped_unanswerable": 2,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": false,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T02:51:15.536707+00:00",
+  "retriever": "hybrid",
+  "embedding_model": "embeddinggemma",
+  "dataset_sha256": "e56ba29781849bd0b8f5832fb52c405fead6e4be3e2319b9fb4c5511ddb222b3"
+}

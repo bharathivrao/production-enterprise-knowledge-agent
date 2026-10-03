@@ -1,0 +1,279 @@
+{
+  "evaluated": 13,
+  "abstention_matches": 12,
+  "citation_sources_match": 11,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "question": "What happens after settlement retries are exhausted?",
+      "answerable": true,
+      "expected_answer": "After the third failed attempt, the batch moves to the settlement dead-letter queue.",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "After settlement retries are exhausted, the batch is moved to the settlement dead-letter queue [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "settlement-replay-wait",
+      "question": "How many minutes should the operator wait before replaying the settlement batch?",
+      "answerable": false,
+      "expected_answer": "The available documents do not contain enough information.",
+      "relevant_documents": [],
+      "relevant_pages": [],
+      "actual_answer": "The available documents do not contain enough information.",
+      "citations": [],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "question": "What is the six-part prompt formula?",
+      "answerable": true,
+      "expected_answer": "ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK.",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The six-part prompt formula is ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "failed-settlement-batches",
+      "question": "How many times are failed settlement batches retried?",
+      "answerable": true,
+      "expected_answer": "Up to three times",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "Three times. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "question": "What must the operator do before replaying a failed batch?",
+      "answerable": true,
+      "expected_answer": "The operator must investigate the failure before replaying the batch ",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The operator must investigate the failure before replaying the batch. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "question": "How should I learn an unfamiliar subject?",
+      "answerable": true,
+      "expected_answer": "Teach this in four layers: intuition, simple example, technical explanation, then a short quiz. Do not continue until I answer the checkpoint.",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "To learn an unfamiliar subject, teach in four layers: intuition, simple example, technical explanation, then a short quiz. Do not continue until I answer the checkpoint. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "failed-recovery",
+      "question": "Where does a batch go once all recovery attempts fail?",
+      "answerable": true,
+      "expected_answer": "After the third failed attempt, the batch is moved to the settlement dead-letter queue.",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The settlement dead-letter queue [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "running-failed-batch",
+      "question": "Can an operator immediately rerun a failed batch?",
+      "answerable": true,
+      "expected_answer": "They must investigate the failure before replaying it",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "No. The operator must investigate the failure before replaying the batch [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "study-with-ai",
+      "question": "How can I get an AI to help me study without rushing ahead?",
+      "answerable": true,
+      "expected_answer": "Teach in four layers and wait for the checkpoint answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "To study without rushing ahead, use the AI's Learning Prompt: request teaching in four layers (intuition, simple example, technical explanation, short quiz) and do not proceed until you answer a checkpoint. [S3]",
+      "citations": [
+        {
+          "source_id": "S3",
+          "document": "sample.pdf",
+          "page": 3
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": false
+    },
+    {
+      "id": "approve-settlement-batch",
+      "question": "Who must approve replaying a settlement batch",
+      "answerable": false,
+      "expected_answer": "The available documents do not contain enough information.",
+      "relevant_documents": [],
+      "relevant_pages": [],
+      "actual_answer": "The operator [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": false,
+      "citation_sources_match": false
+    },
+    {
+      "id": "privacy-before-sharing",
+      "question": "What should I check before pasting sensitive material into an AI tool?",
+      "answerable": true,
+      "expected_answer": "Check for secrets, personal identifiers and confidential information, and redact them before sharing.",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "Check if the material contains passwords, API keys, personal identifiers, confidential company data, medical details, financial account data, or information you do not have permission to share. Redact such information first. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "code-review-criteria",
+      "question": "Which issues should an AI look for when reviewing code?",
+      "answerable": true,
+      "expected_answer": "Review correctness, edge cases, complexity, security, concurrency, failure recovery, observability, maintainability and tests; rank findings by severity.",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        3
+      ],
+      "actual_answer": "An AI should look for correctness, edge cases, complexity, security, concurrency, failure recovery, observability, maintainability, and tests when reviewing code [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 3
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    },
+    {
+      "id": "goal-to-plan",
+      "question": "How should I turn a goal into an actionable plan?",
+      "answerable": true,
+      "expected_answer": "Break the goal into milestones, next actions, dependencies, risks and a realistic timeline, starting with the smallest useful next step.",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        4
+      ],
+      "actual_answer": "Turn the goal into milestones, next actions, dependencies, risks, and a realistic timeline, starting with the smallest useful next step. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 4
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true
+    }
+  ]
+}

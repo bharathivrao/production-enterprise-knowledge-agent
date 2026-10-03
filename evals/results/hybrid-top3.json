@@ -1,0 +1,181 @@
+{
+  "top_k": 3,
+  "evaluated": 8,
+  "hits": 8,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 2,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rrf_score": 0.03225806451612903
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03125763125763126
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rrf_score": 0.03149801587301587
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rrf_score": 0.03128054740957967
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rrf_score": 0.03225806451612903
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03149801587301587
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rrf_score": 0.0315136476426799
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03149801587301587
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rrf_score": 0.031754032258064516
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.031746031746031744
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rrf_score": 0.031746031746031744
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rrf_score": 0.03128054740957967
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rrf_score": 0.031746031746031744
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.0315136476426799
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rrf_score": 0.03200204813108039
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rrf_score": 0.031754032258064516
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T02:51:16.949328+00:00",
+  "retriever": "hybrid",
+  "embedding_model": "embeddinggemma",
+  "dataset_sha256": "e56ba29781849bd0b8f5832fb52c405fead6e4be3e2319b9fb4c5511ddb222b3"
+}

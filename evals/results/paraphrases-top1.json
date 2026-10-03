@@ -1,0 +1,100 @@
+{
+  "top_k": 1,
+  "evaluated": 8,
+  "hits": 7,
+  "hit_rate": 0.875,
+  "skipped_unanswerable": 2,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.33042089213819237
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.42731738930796836
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.20721060842897365
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.3666738311415344
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6784069198106448
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.34478439341333744
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.38554442790482324
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": false,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5286421426578496
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T01:27:36.652877+00:00",
+  "embedding_model": "embeddinggemma",
+  "dataset_sha256": "e56ba29781849bd0b8f5832fb52c405fead6e4be3e2319b9fb4c5511ddb222b3"
+}

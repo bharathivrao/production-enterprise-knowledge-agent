@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python caches
+**/__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables (Sensitive data)
+.env
+*.env
+
+# macOS system files
+.DS_Store

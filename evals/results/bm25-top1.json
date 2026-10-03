@@ -1,0 +1,101 @@
+{
+  "top_k": 1,
+  "evaluated": 8,
+  "hits": 7,
+  "hit_rate": 0.875,
+  "skipped_unanswerable": 2,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 3.7219898284529016
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "bm25_score": 2.3706587784365136
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 9.556241757235734
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 10.842207808163444
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "bm25_score": 1.144075661001719
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 2.2922326686131407
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 6.355474967311126
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": false,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "bm25_score": 2.516949813383355
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T01:54:58.233117+00:00",
+  "retriever": "bm25",
+  "embedding_model": null,
+  "dataset_sha256": "e56ba29781849bd0b8f5832fb52c405fead6e4be3e2319b9fb4c5511ddb222b3"
+}

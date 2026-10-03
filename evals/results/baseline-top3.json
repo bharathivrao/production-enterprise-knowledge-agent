@@ -1,0 +1,114 @@
+{
+  "top_k": 3,
+  "evaluated": 5,
+  "hits": 5,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 1,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.33042089213819237
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5340614816638036
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.7769260023655897
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.42731738930796836
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.42731738930796836
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5465313220386405
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.20721060842897365
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5336724916588427
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7323521258201331
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.3666738311415344
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5963369074758627
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6941253311484636
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6784069198106448
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6784069198106448
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7325355847201095
+        }
+      ]
+    }
+  ]
+}

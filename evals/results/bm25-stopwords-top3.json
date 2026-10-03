@@ -1,0 +1,181 @@
+{
+  "top_k": 3,
+  "evaluated": 8,
+  "hits": 8,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 2,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 2.9648936199000717
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "bm25_score": 0.9790738856261273
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 0.0
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "bm25_score": 1.9718489438113802
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 0.0
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "bm25_score": 0.0
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 8.894656649773024
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "bm25_score": 0.9790738856261273
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 0.0
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 10.44512619228357
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 0.3477715307259195
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "bm25_score": 0.3271728098952167
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "bm25_score": 1.1318761299459477
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 0.7274209699783906
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "bm25_score": 0.4460254342319078
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 2.3202930593896633
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 1.6079399976687783
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "bm25_score": 0.0
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "bm25_score": 6.445321104020971
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "bm25_score": 0.9859244719056901
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 0.0
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": true,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "bm25_score": 1.3839928262928123
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "bm25_score": 0.3477715307259195
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "bm25_score": 0.244806581634968
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T02:54:00.457042+00:00",
+  "retriever": "bm25",
+  "embedding_model": null,
+  "dataset_sha256": "e56ba29781849bd0b8f5832fb52c405fead6e4be3e2319b9fb4c5511ddb222b3"
+}

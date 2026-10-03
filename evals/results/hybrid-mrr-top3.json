@@ -1,0 +1,198 @@
+{
+  "top_k": 3,
+  "evaluated": 8,
+  "hits": 8,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 2,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rrf_score": 0.03225806451612903
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rrf_score": 0.015873015873015872
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rrf_score": 0.016129032258064516
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rrf_score": 0.015873015873015872
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rrf_score": 0.03225806451612903
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rrf_score": 0.015873015873015872
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03149801587301587
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rrf_score": 0.03128054740957967
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rrf_score": 0.031754032258064516
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.031746031746031744
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rrf_score": 0.03128054740957967
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rrf_score": 0.016129032258064516
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.0315136476426799
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rrf_score": 0.016129032258064516
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": true,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rrf_score": 0.03278688524590164
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rrf_score": 0.03200204813108039
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rrf_score": 0.031754032258064516
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T03:02:38.090024+00:00",
+  "retriever": "hybrid",
+  "embedding_model": "embeddinggemma",
+  "dataset_sha256": "e56ba29781849bd0b8f5832fb52c405fead6e4be3e2319b9fb4c5511ddb222b3",
+  "mrr": 0.9375
+}

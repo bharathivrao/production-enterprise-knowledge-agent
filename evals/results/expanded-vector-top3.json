@@ -1,0 +1,267 @@
+{
+  "top_k": 3,
+  "evaluated": 11,
+  "hits": 11,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 2,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.33042089213819237
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5340614816638036
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.7769260023655897
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.42731738930796836
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5465313220386405
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5664808998228412
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.20721060842897365
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5336724916588427
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7323521258201331
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.3666738311415344
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5963369074758627
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6941253311484636
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6784069198106448
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7325355847201095
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.7424604892730695
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.34478439341333744
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5789850730611272
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7441839880723949
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.38554442790482324
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5903653760982117
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6871119887561736
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": true,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5286421426578496
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5436123673610898
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5510505973040314
+        }
+      ]
+    },
+    {
+      "id": "privacy-before-sharing",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.48696938856095795
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.4882045998329365
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5408361481125081
+        }
+      ]
+    },
+    {
+      "id": "code-review-criteria",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.47352433520265025
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5458128370381281
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5737583837613003
+        }
+      ]
+    },
+    {
+      "id": "goal-to-plan",
+      "hit": true,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.5938475448346909
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.6773981500157389
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.701497202486941
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T03:04:55.685356+00:00",
+  "retriever": "vector",
+  "embedding_model": "embeddinggemma",
+  "dataset_sha256": "60a94a6beb88e79fc661f437dcfbfbe2e2b0ee33fff382f15a2436f93afa9407",
+  "mrr": 0.9545454545454546
+}
