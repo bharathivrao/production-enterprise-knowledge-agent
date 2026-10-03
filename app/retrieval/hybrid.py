@@ -1,13 +1,15 @@
-from app.retrieval.bm25 import search_bm25
+from app.retrieval.bm25 import search_keyword
 from app.retrieval.vector_search import search_chunks
+from app.core.config import get_settings
+from app.retrieval.scope import PUBLIC_SCOPE, RetrievalScope
 
 def reciprocal_rank_fusion(
     ranked_lists: list[list[dict]],
     top_k: int = 5,
     rank_constant: int = 60,
 ) -> list[dict]:
-    if not 1 <= top_k <= 20:
-        raise ValueError("top_k must be between 1 and 20")
+    if not 1 <= top_k <= 100:
+        raise ValueError("top_k must be between 1 and 100")
 
     if rank_constant < 1:
         raise ValueError("rank_constant must be positive")
@@ -45,27 +47,42 @@ def reciprocal_rank_fusion(
             "content": chunks[chunk_id]["content"],
             "rrf_score": scores[chunk_id],
         }
+        for field in (
+            "document_id", "document_version", "conflict_group", "valid_until",
+            "distance", "keyword_score",
+        ):
+            if field in chunks[chunk_id]:
+                result[field] = chunks[chunk_id][field]
         if chunks[chunk_id].get("section") is not None:
             result["section"] = chunks[chunk_id]["section"]
         fused.append(result)
     return fused
 
-def search_hybrid(query: str, top_k: int = 5) -> list[dict]:
+def search_hybrid(
+    query: str,
+    top_k: int = 5,
+    *,
+    candidate_k: int | None = None,
+    scope: RetrievalScope = PUBLIC_SCOPE,
+) -> list[dict]:
     if not query.strip():
         raise ValueError("query must not be blank")
 
-    if not 1 <= top_k <= 20:
-        raise ValueError("top_k must be between 1 and 20")
+    if not 1 <= top_k <= 100:
+        raise ValueError("top_k must be between 1 and 100")
 
-    candidate_k = min(20, max(10, top_k))
+    configured = get_settings().reranker_candidate_count
+    candidate_k = candidate_k or min(100, max(configured, top_k))
+    if not top_k <= candidate_k <= 100:
+        raise ValueError("candidate_k must be between top_k and 100")
 
-    vector_results = search_chunks(query, top_k=candidate_k)
-    bm25_results = search_bm25(query, top_k=candidate_k)
+    vector_results = search_chunks(query, top_k=candidate_k, scope=scope)
+    bm25_results = search_keyword(query, top_k=candidate_k, scope=scope)
 
     matching_bm25_results = [
         result
         for result in bm25_results
-        if result["bm25_score"] > 0
+        if result["keyword_score"] > 0
     ]
 
     return reciprocal_rank_fusion(

@@ -161,3 +161,32 @@ def test_ask_returns_502_when_model_is_missing():
     assert response.json() == {
         "detail": "The model service could not complete the request."
     }
+
+
+def test_search_can_select_reranked_retrieval():
+    expected = [{
+        "chunk_id": "one", "document": "policy.md", "page": None,
+        "content": "evidence", "rerank_score": 0.9,
+    }]
+    with patch("app.api.query.search_reranked", return_value=expected) as search:
+        response = client.post(
+            "/search",
+            json={"query": "policy", "top_k": 3, "retriever": "reranked"},
+        )
+    assert response.status_code == 200
+    assert response.json() == {"results": expected}
+    search.assert_called_once_with("policy", 3)
+
+
+def test_reranker_failure_returns_503():
+    from app.retrieval.reranker import RerankerUnavailableError
+
+    with patch(
+        "app.api.query.search_reranked",
+        side_effect=RerankerUnavailableError("missing checkpoint"),
+    ):
+        response = client.post(
+            "/search",
+            json={"query": "policy", "retriever": "reranked"},
+        )
+    assert response.status_code == 503

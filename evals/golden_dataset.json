@@ -118,5 +118,29 @@
       "expected_answer": "The available documents do not contain enough information.",
       "relevant_documents": [],
       "relevant_pages": []
+    },
+    {
+      "id": "sev1-payment-response-multi-document",
+      "question": "Which team owns a severity-one payments incident, and what should responders do first?",
+      "answerable": true,
+      "expected_answer": "The Mercury team owns the payments platform. Responders should page the primary on-call responder, open an incident channel, and preserve transaction logs before restarting services.",
+      "relevant_documents": ["service-ownership.md", "payment-incident-runbook.md"],
+      "relevant_pages": [null, null]
+    },
+    {
+      "id": "current-payment-retry-version",
+      "question": "Under the current payment retry policy, how many retries are allowed and how long is the delay?",
+      "answerable": true,
+      "expected_answer": "Up to two retries are allowed, with at least 30 seconds between attempts.",
+      "relevant_documents": ["payment-retry-policy-v2.md"],
+      "relevant_pages": [null]
+    },
+    {
+      "id": "payment-owner-and-recovery-validation",
+      "question": "Who owns the payments platform and what must be validated before recovery is complete?",
+      "answerable": true,
+      "expected_answer": "The Mercury team owns the payments platform, and settlement totals must be validated before recovery is declared complete.",
+      "relevant_documents": ["service-ownership.md", "payment-incident-runbook.md"],
+      "relevant_pages": [null, null]
     }
   ]

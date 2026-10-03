@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 import logging
 from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
 from app.generation.pipeline import answer_question
 import httpx
 from fastapi import HTTPException
@@ -9,6 +10,9 @@ import psycopg
 from psycopg_pool import PoolTimeout
 
 from app.retrieval.vector_search import search_chunks
+from app.retrieval.bm25 import search_keyword
+from app.retrieval.hybrid import search_hybrid
+from app.retrieval.reranker import RerankerUnavailableError, search_reranked
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["retrieval"])
@@ -18,6 +22,7 @@ class SearchRequest(BaseModel):
 
     query: str = Field(min_length=1, max_length=2000)
     top_k: int = Field(default=5, ge=1, le=20)
+    retriever: Literal["vector", "keyword", "hybrid", "reranked"] = "vector"
 
 class CitationResponse(BaseModel):
     source_id: str
@@ -32,7 +37,13 @@ class AnswerResponse(BaseModel):
 @router.post("/search")
 def search(request: SearchRequest):
     try:
-        results = search_chunks(request.query, request.top_k)
+        searches = {
+            "vector": search_chunks,
+            "keyword": search_keyword,
+            "hybrid": search_hybrid,
+            "reranked": search_reranked,
+        }
+        results = searches[request.retriever](request.query, request.top_k)
         return {"results": results}
     except ConnectionError as error:
         logger.exception("Model service connection failed")
@@ -52,15 +63,19 @@ def search(request: SearchRequest):
     except (psycopg.OperationalError, psycopg.errors.QueryCanceled, PoolTimeout) as error:
         logger.exception("Database request failed")
         raise HTTPException(503, "The database is unavailable. Try again later.") from error
+    except RerankerUnavailableError as error:
+        logger.exception("Reranker failed")
+        raise HTTPException(503, "The reranker is unavailable. Try again later.") from error
 
     
 
 @router.post("/ask", response_model=AnswerResponse, response_model_exclude_none=True)
 def ask(request: SearchRequest):
     try:
+        if request.retriever == "vector":
+            return answer_question(request.query, top_k=request.top_k)
         return answer_question(
-            request.query,
-            top_k=request.top_k,
+            request.query, top_k=request.top_k, retriever=request.retriever,
         )
     except CitationValidationError as error:
         logger.exception("Generated answer failed citation validation")
@@ -88,3 +103,6 @@ def ask(request: SearchRequest):
     except (psycopg.OperationalError, psycopg.errors.QueryCanceled, PoolTimeout) as error:
         logger.exception("Database request failed")
         raise HTTPException(503, "The database is unavailable. Try again later.") from error
+    except RerankerUnavailableError as error:
+        logger.exception("Reranker failed")
+        raise HTTPException(503, "The reranker is unavailable. Try again later.") from error

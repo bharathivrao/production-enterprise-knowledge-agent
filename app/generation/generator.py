@@ -23,6 +23,9 @@ def generate_answer(question, context):
                     "provide the specific fact requested, return exactly: "
                     "'The available documents do not contain enough information.' "
                     "Do not infer approval authority from responsibility for investigation or replay. "
+                    "If current sources directly conflict, describe the conflict, cite each side, "
+                    "and do not silently choose one unless the evidence explicitly establishes "
+                    "which version supersedes the other. "
                 ),
             },
             {

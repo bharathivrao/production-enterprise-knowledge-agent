@@ -11,6 +11,7 @@ from app.api import health, ingest, query
 from app.core.config import get_settings
 from app.core.model_client import model_client
 from app.db.database import close_database_pool, start_database_pool
+from app.retrieval.reranker import close_reranker
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,7 @@ async def lifespan(app: FastAPI):
         close_database_pool()
     yield
     close_database_pool()
+    close_reranker()
     model_client.close()
 
 

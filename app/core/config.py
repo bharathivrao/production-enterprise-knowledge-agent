@@ -23,8 +23,15 @@ class Settings(BaseSettings):
     embedding_model: str = "embeddinggemma"
     embedding_dimension: int = Field(default=768, ge=1)
     generation_model: str = "qwen3:4b"
+    reranker_model: str = "cross-encoder/ms-marco-MiniLM-L6-v2"
+    reranker_candidate_count: int = Field(default=10, ge=1, le=100)
+    reranker_batch_size: int = Field(default=16, ge=1, le=128)
+    reranker_max_length: int = Field(default=512, ge=128)
+    reranker_min_score: float = Field(default=0.0, ge=0, le=1)
+    vector_max_distance: float | None = Field(default=None, ge=0, le=2)
+    max_context_tokens: int = Field(default=3500, ge=256)
 
-    chunk_size: int = Field(default=500, ge=1)
+    chunk_size: int = Field(default=400, ge=1)
     chunk_overlap: int = Field(default=50, ge=0)
     max_upload_bytes: int = Field(default=10 * 1024 * 1024, ge=1)
 

@@ -33,7 +33,9 @@ def _insert_chunks(cursor, document_id, chunks, embeddings) -> None:
 
 
 def store_document(filename, content_type, chunks, embeddings, *, content_hash,
-                   source_bytes=None, provenance=None):
+                   source_bytes=None, provenance=None, tenant_id="default",
+                   access_groups=("public",), document_version=1,
+                   conflict_group=None, valid_from=None, valid_until=None):
     _validate_chunks(chunks, embeddings)
     document_id = uuid4()
     provenance = provenance or {}
@@ -44,9 +46,12 @@ def store_document(filename, content_type, chunks, embeddings, *, content_hash,
                 INSERT INTO documents (
                     id, filename, content_type, content_hash, source_bytes,
                     parser_name, parser_version, chunk_size, chunk_overlap,
-                    embedding_model, embedding_dimension, index_fingerprint
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (content_hash, index_fingerprint) DO NOTHING
+                    embedding_model, embedding_dimension, index_fingerprint,
+                    tenant_id, access_groups, document_version, conflict_group,
+                    valid_from, valid_until
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (tenant_id, content_hash, index_fingerprint) DO NOTHING
                 RETURNING id
                 """,
                 (
@@ -55,6 +60,8 @@ def store_document(filename, content_type, chunks, embeddings, *, content_hash,
                     provenance.get("chunk_size"), provenance.get("chunk_overlap"),
                     provenance.get("embedding_model"), provenance.get("embedding_dimension"),
                     provenance.get("index_fingerprint"),
+                    tenant_id, list(access_groups), document_version,
+                    conflict_group, valid_from, valid_until,
                 ),
             )
             if cursor.fetchone() is None:
@@ -95,14 +102,14 @@ def replace_document_index(document_id, filename, content_type, chunks, embeddin
     return True
 
 
-def find_document_by_hash(content_hash, index_fingerprint=None):
+def find_document_by_hash(content_hash, index_fingerprint=None, *, tenant_id="default"):
     query = """
         SELECT d.id, d.filename, COUNT(c.id), d.index_fingerprint
         FROM documents AS d
         LEFT JOIN document_chunks AS c ON c.document_id = d.id
-        WHERE d.content_hash = %s
+        WHERE d.content_hash = %s AND d.tenant_id = %s
     """
-    parameters = [content_hash]
+    parameters = [content_hash, tenant_id]
     if index_fingerprint is not None:
         query += " AND d.index_fingerprint = %s"
         parameters.append(index_fingerprint)
@@ -133,6 +140,35 @@ def delete_document(document_id: UUID | str) -> bool:
     with database_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute("DELETE FROM documents WHERE id = %s", (document_id,))
+            return cursor.rowcount == 1
+
+
+def update_document_retrieval_metadata(
+    document_id: UUID | str,
+    *,
+    access_groups=("public",),
+    document_version=1,
+    conflict_group=None,
+    valid_from=None,
+    valid_until=None,
+) -> bool:
+    if not access_groups:
+        raise ValueError("access_groups must not be empty")
+    with database_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE documents SET
+                    access_groups = %s, document_version = %s,
+                    conflict_group = %s, valid_from = %s, valid_until = %s,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+                """,
+                (
+                    list(access_groups), document_version, conflict_group,
+                    valid_from, valid_until, document_id,
+                ),
+            )
             return cursor.rowcount == 1
 
 

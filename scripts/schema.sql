@@ -13,9 +13,17 @@ CREATE TABLE IF NOT EXISTS documents (
     embedding_model TEXT,
     embedding_dimension INTEGER CHECK (embedding_dimension IS NULL OR embedding_dimension > 0),
     index_fingerprint TEXT CHECK (index_fingerprint IS NULL OR index_fingerprint ~ '^[0-9a-f]{64}$'),
+    tenant_id TEXT NOT NULL DEFAULT 'default',
+    access_groups TEXT[] NOT NULL DEFAULT ARRAY['public']::TEXT[],
+    document_version INTEGER NOT NULL DEFAULT 1 CHECK (document_version > 0),
+    conflict_group TEXT,
+    valid_from TIMESTAMPTZ,
+    valid_until TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (content_hash, index_fingerprint)
+    UNIQUE (tenant_id, content_hash, index_fingerprint),
+    CHECK (cardinality(access_groups) > 0),
+    CHECK (valid_until IS NULL OR valid_from IS NULL OR valid_until > valid_from)
 );
 
 CREATE TABLE IF NOT EXISTS document_chunks (
@@ -26,8 +34,16 @@ CREATE TABLE IF NOT EXISTS document_chunks (
     page INTEGER CHECK (page IS NULL OR page > 0),
     section TEXT,
     embedding VECTOR(768),
+    search_vector TSVECTOR GENERATED ALWAYS AS (
+        to_tsvector('english', coalesce(content, ''))
+    ) STORED,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (document_id, chunk_index)
 );
 
 CREATE INDEX IF NOT EXISTS idx_document_chunks_document_id ON document_chunks (document_id);
+CREATE INDEX IF NOT EXISTS idx_document_chunks_search_vector
+    ON document_chunks USING GIN (search_vector);
+CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding_hnsw
+    ON document_chunks USING hnsw (embedding vector_cosine_ops)
+    WHERE embedding IS NOT NULL;

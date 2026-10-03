@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stage 1 is complete: the service has multi-format ingestion, index provenance, lifecycle operations, pooled database access, dependency readiness, and PostgreSQL/pgvector integration coverage. It is not yet a complete agent or a production-ready enterprise service.
+Current status: Stages 1 and 2 are complete: the service has reliable multi-format ingestion plus permission-aware vector, PostgreSQL full-text, hybrid, and cross-encoder-reranked retrieval with measured defaults. It is not yet a complete agent or a production-ready enterprise service.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -104,18 +104,24 @@ The Stage 1 migration was successfully applied to the local development database
 
 ### 2. Production retrieval and reranking
 
-Status: vector, BM25, and rank fusion implemented; reranker remains empty.
+Status: completed October 3, 2026; pending owner review.
 
-- [ ] Implement a cross-encoder reranker over retrieved candidates.
-- [ ] Evaluate vector, BM25, hybrid, and reranked variants using the same corpus and dataset.
-- [ ] Add questions requiring evidence across multiple documents, including conflicting versions.
-- [ ] Evaluate chunk-size/overlap choices against the actual embedding model's input limits.
-- [ ] Add metadata filters and enforce document permissions before retrieval results enter prompts or rerankers.
-- [ ] Replace per-query full-corpus BM25 rebuilding with a maintained index or PostgreSQL search approach suitable for the expected corpus size.
-- [ ] Select candidate counts, indexes, and context budgets based on measured quality and latency.
-- [ ] Define behavior when retrieval finds weak, stale, duplicate, or contradictory evidence.
+- [x] Implement a cross-encoder reranker over retrieved candidates.
+- [x] Evaluate vector, BM25, hybrid, and reranked variants using the same corpus and dataset.
+- [x] Add questions requiring evidence across multiple documents, including conflicting versions.
+- [x] Evaluate chunk-size/overlap choices against the actual embedding model's input limits.
+- [x] Add metadata filters and enforce document permissions before retrieval results enter prompts or rerankers.
+- [x] Replace per-query full-corpus BM25 rebuilding with a maintained index or PostgreSQL search approach suitable for the expected corpus size.
+- [x] Select candidate counts, indexes, and context budgets based on measured quality and latency.
+- [x] Define behavior when retrieval finds weak, stale, duplicate, or contradictory evidence.
 
 Completion evidence: reproducible quality/latency comparisons and a documented default retriever justified by results. Hybrid is not automatically considered better.
+
+Evidence: all five Stage 2 comparisons use the same versioned dataset and corpus.
+Vector remains the default because vector and hybrid tied for the best MRR@3
+(0.9643), while hybrid added no quality and reranking reduced MRR to 0.9286 with
+higher latency. All variants achieved complete source coverage at `k=3` on the
+14 answerable cases; see `docs/retrieval-policy.md` for limitations.
 
 ### 3. Evaluation and quality measurement
 
@@ -241,4 +247,3 @@ Develop access-boundary requirements before implementing features that store or 
 A portfolio implementation of all nine stages is complete when each stage's completion evidence is demonstrated, the test/evaluation results are reproducible, deployment documentation works, and limitations are explicit.
 
 Production acceptance additionally requires agreed security and quality thresholds, realistic load testing, tested recovery procedures, and review against the actual deployment's requirements. Small-corpus perfect scores do not replace these checks.
-

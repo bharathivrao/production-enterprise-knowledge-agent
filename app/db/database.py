@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import atexit
 
 from pgvector.psycopg import register_vector
 from psycopg import Connection
@@ -81,3 +82,6 @@ def database_ready() -> bool:
             )
             row = cursor.fetchone()
     return bool(row and row[0])
+
+
+atexit.register(close_database_pool)

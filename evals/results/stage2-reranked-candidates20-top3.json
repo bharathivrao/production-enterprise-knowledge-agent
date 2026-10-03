@@ -1,0 +1,390 @@
+{
+  "top_k": 3,
+  "evaluated": 14,
+  "hits": 14,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 4,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 3967.7094999933615,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rerank_score": 0.9153981804847717
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "rerank_score": 0.00041382861672900617
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rerank_score": 0.00037647649878636
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 196.89712498802692,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rerank_score": 0.9949809908866882
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rerank_score": 0.0014647068455815315
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rerank_score": 7.906102837296203e-05
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 167.49612498097122,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rerank_score": 0.9999649524688721
+        },
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "rerank_score": 0.7215356826782227
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rerank_score": 0.0004200521216262132
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 152.02995797153562,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rerank_score": 0.9996131062507629
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "rerank_score": 0.00011150816862937063
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rerank_score": 4.2398842197144404e-05
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 151.46458300296217,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rerank_score": 0.9954003691673279
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rerank_score": 0.00017482081602793187
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rerank_score": 2.8456190193537623e-05
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 148.2402499532327,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rerank_score": 0.9930039048194885
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rerank_score": 6.018603380653076e-05
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "rerank_score": 3.5591565392678604e-05
+        }
+      ]
+    },
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 140.29212505556643,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rerank_score": 0.9904775619506836
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rerank_score": 2.1112502508913167e-05
+        },
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "rerank_score": 1.956640880962368e-05
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "latency_ms": 146.47329098079354,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rerank_score": 0.0011204102775081992
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rerank_score": 0.00021305344125721604
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rerank_score": 9.48858360061422e-05
+        }
+      ]
+    },
+    {
+      "id": "privacy-before-sharing",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 142.84570806194097,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "rerank_score": 0.9963158965110779
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rerank_score": 0.4703187942504883
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rerank_score": 0.034728243947029114
+        }
+      ]
+    },
+    {
+      "id": "code-review-criteria",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "latency_ms": 136.28804101608694,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rerank_score": 0.0018064004834741354
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rerank_score": 0.0017900355160236359
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rerank_score": 0.00034627143759280443
+        }
+      ]
+    },
+    {
+      "id": "goal-to-plan",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 132.63666594866663,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "rerank_score": 0.9971185922622681
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "rerank_score": 0.014068348333239555
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "rerank_score": 1.6214680726989172e-05
+        }
+      ]
+    },
+    {
+      "id": "sev1-payment-response-multi-document",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 141.07441704254597,
+      "retrieved_sources": [
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "rerank_score": 0.9862706661224365
+        },
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "rerank_score": 0.9701115489006042
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rerank_score": 0.0015119409654289484
+        }
+      ]
+    },
+    {
+      "id": "current-payment-retry-version",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 141.74049999564886,
+      "retrieved_sources": [
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "rerank_score": 0.9883763194084167
+        },
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "rerank_score": 6.018672866048291e-05
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "rerank_score": 1.8764985725283623e-05
+        }
+      ]
+    },
+    {
+      "id": "payment-owner-and-recovery-validation",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 142.08708296064287,
+      "retrieved_sources": [
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "rerank_score": 0.9055740833282471
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "rerank_score": 0.25508278608322144
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "rerank_score": 0.04823476821184158
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T23:27:01.858198+00:00",
+  "retriever": "reranked",
+  "embedding_model": "embeddinggemma",
+  "dataset_sha256": "e59b6f530a423775046781cbea0973c6720cd5c635a9247285e30164b437ed54",
+  "mrr": 0.9285714285714286,
+  "full_coverage_rate": 1.0,
+  "mean_source_recall": 1.0,
+  "latency_ms": {
+    "mean": 421.948240853713,
+    "p50": 142.84570806194097,
+    "p95": 196.89712498802692
+  },
+  "retrieval_config": {
+    "reranker_model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "candidate_count": 20,
+    "top_k": 3
+  }
+}
