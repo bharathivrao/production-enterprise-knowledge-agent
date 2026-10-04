@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     workflow_max_model_calls: int = Field(default=6, ge=3, le=10)
     workflow_max_tokens: int = Field(default=12000, ge=2048)
     workflow_max_runtime_seconds: int = Field(default=600, ge=30)
+    tool_workflow_max_steps: int = Field(default=5, ge=3, le=5)
+    tool_workflow_max_model_calls: int = Field(default=7, ge=4, le=10)
+    tool_workflow_max_tool_calls: int = Field(default=4, ge=2, le=4)
+    tool_max_elapsed_seconds: int = Field(default=120, ge=1, le=600)
 
     chunk_size: int = Field(default=400, ge=1)
     chunk_overlap: int = Field(default=50, ge=0)

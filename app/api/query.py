@@ -6,9 +6,12 @@ from typing import Literal
 from app.agents.goal_analyzer import InvalidGoalAnalysis
 from app.agents.planner import InvalidPlan
 from app.agents.synthesizer import InvalidSynthesis
+from app.agents.tool_selector import InvalidToolChoice
 from app.agents.workflow import (
-    WorkflowBudgetExceeded, WorkflowResult, WorkflowRunError, run_planned_answer,
+    WorkflowBudgetExceeded, WorkflowResult, WorkflowRunError,
+    run_planned_answer, run_tool_answer,
 )
+from app.tools.dispatcher import ToolError
 from app.generation.pipeline import answer_question
 import httpx
 from fastapi import HTTPException
@@ -124,13 +127,28 @@ def ask(request: SearchRequest):
 
 @router.post("/ask/planned", response_model=WorkflowResult, response_model_exclude_none=True)
 def ask_planned(request: PlannedAskRequest):
+    return _answer_workflow(request, run_planned_answer)
+
+
+@router.post("/ask/tools", response_model=WorkflowResult, response_model_exclude_none=True)
+def ask_tools(request: PlannedAskRequest):
+    return _answer_workflow(request, run_tool_answer)
+
+
+def _answer_workflow(request: PlannedAskRequest, runner):
     try:
-        return run_planned_answer(request.query, top_k=request.top_k)
+        return runner(request.query, top_k=request.top_k)
     except WorkflowRunError as error:
         cause = error.cause
         if isinstance(cause, WorkflowBudgetExceeded):
             status_code, message = 504, "The planned answer exceeded its budget."
-        elif isinstance(cause, (InvalidGoalAnalysis, InvalidPlan, InvalidSynthesis, CitationValidationError)):
+        elif isinstance(cause, ToolError):
+            status_code = 504 if cause.code in ("timeout", "call_limit") else (
+                503 if cause.code in ("dependency_unavailable", "tool_failed") else 502
+            )
+            message = "The tool request could not be completed."
+        elif isinstance(cause, (InvalidGoalAnalysis, InvalidPlan, InvalidSynthesis,
+                                InvalidToolChoice, CitationValidationError)):
             status_code, message = 502, "The planned answer failed validation."
         elif isinstance(cause, (ConnectionError, RerankerUnavailableError)):
             status_code, message = 503, "A required model service is unavailable."

@@ -9,16 +9,18 @@ retrieves permission-scoped evidence, answers with citations, and eventually
 supports bounded tools, memory, verification, access controls, and deployment.
 The nine stages are in `PROJECT_ROADMAP.md`. The owner wants **one stage at a
 time**, followed by an explanation of what it does and why and a request for
-review. Do not begin the next stage before review. Stage 4 is implemented and
-pending owner review. The owner requested a Stage 4 push after implementation;
-verify the latest commit and remote state with `git status` and `git log` before
-continuing. This is not yet safe for real enterprise data.
+review. Do not begin the next stage before review. Stages 1–4 were pushed to
+`origin/main`; Stage 5 is implemented and pending owner review. The owner
+requested a Stage 5 push after the README update; verify current Git status
+and the latest commit before continuing. This is not yet safe for real
+enterprise data.
 
 ## Current architecture
 
 - Python 3.14, FastAPI/Pydantic in `app/main.py` and `app/api/`. `POST /ask`
-  remains single-pass RAG; `POST /ask/planned` is the opt-in Stage 4 workflow.
-  Other endpoints cover documents, search, and health/readiness.
+  remains single-pass RAG; `POST /ask/planned` is the Stage 4 workflow;
+  `POST /ask/tools` is the opt-in Stage 5 tool-enabled workflow. Other
+  endpoints cover documents, search, and health/readiness.
 - PostgreSQL 17/pgvector via Docker Compose (`127.0.0.1:5433`) and psycopg
   pool. Ingestion parses PDF, TXT, Markdown, DOCX, chunks and embeds with
   Ollama `embeddinggemma`, and stores provenance and source metadata.
@@ -33,7 +35,13 @@ continuing. This is not yet safe for real enterprise data.
   validates a bounded read-only search plan, retrieves with a frozen as-of
   timestamp and server scope, and synthesizes structured cited findings.
   Response includes goal, plan, trace, usage, and metadata. Search calls the
-  existing retriever directly, **not** a Stage 5 tool dispatcher.
+  existing retriever directly, preserving Stage 4 behavior.
+- Stage 5 (`app/tools/`, `app/agents/tool_selector.py`) routes the tool-enabled
+  path through validated, read-only search and scoped chunk-read tools. Search
+  returns previews and IDs; a structured model choice selects up to three IDs
+  from those results for a scoped full-text read. A local stdio MCP server
+  exposes the same dispatcher with a fixed public scope; there is no HTTP MCP
+  listener or user authentication.
 
 ## Important design decisions
 
@@ -55,17 +63,27 @@ continuing. This is not yet safe for real enterprise data.
   12,000 accounted tokens, 600 seconds, plus per-call output caps. Ollama chat
   tokens are reported; embedding query tokens are estimated. Runtime checks
   are cooperative: in-flight calls cannot be cancelled at the exact deadline.
+- Stage 5 tool mode separately permits five steps, seven model calls, four
+  tool calls, and one read of up to three chunks. `ToolDispatcher` rejects
+  unknown names, extra/invalid arguments, exhausted budgets and missing or
+  unauthorized chunk IDs. Its read SQL reuses `document_filter_sql`, so tenant,
+  access groups, validity, latest version, and document filters apply before
+  content leaves PostgreSQL. Missing and denied IDs are indistinguishable.
+  Traces record argument sizes, result counts, status, and timing—not raw text.
+- MCP uses stdio only to avoid exposing an unauthenticated network tool
+  endpoint. This is an intentional Stage 5 boundary, not Stage 8 identity.
 - Stage 2 vector default is measurement-based. Stage 3 held-out cases are
   acceptance-only; tune on development data. Local-model API charge is $0,
   but hardware/energy costs are unmeasured.
 
 ## Completed functionality and files changed
 
-Stages 1–3 are on `origin/main`. Stage 1 covers multi-format ingestion,
+Stages 1–4 are on `origin/main`. Stage 1 covers multi-format ingestion,
 document lifecycle, provenance, database reliability and tests. Stage 2 covers
 scoped search, full-text/hybrid retrieval, reranking and retrieval policy.
 Stage 3 covers evaluation; implementation commit `91df72d` and README follow-up
 `9232dd3` were pushed previously.
+Stage 4 implementation was pushed as `3357599`.
 
 Stage 4 change set:
 
@@ -86,12 +104,42 @@ Stage 4 change set:
   `evals/results/stage4-three-source-comparison.json`, and
   `evals/results/stage4-clarification.json` (new): real local runs.
 
+Stage 5 change set:
+
+- `app/tools/dispatcher.py`, `app/tools/__init__.py`: typed search/read
+  contracts, scope-bound dispatch, allowlist, budgets and controlled errors.
+- `app/tools/mcp_server.py`: local stdio MCP adapter with read-only tool hints.
+- `app/agents/tool_selector.py`: structured model selection and validation of
+  returned chunk IDs and named-document coverage.
+- `app/agents/workflow.py`, `app/api/query.py`, `app/core/config.py`,
+  `.env.example`: opt-in tool workflow/API, trace and limit settings.
+- `pyproject.toml`, `uv.lock`: official Python `mcp` SDK v2 dependency.
+- `tests/test_stage5_*.py`, `tests/integration/test_postgres_retrieval.py`:
+  contracts, workflow/API/MCP boundaries, and real PostgreSQL read isolation.
+- `docs/tool-policy.md`, `README.md`, `PROJECT_ROADMAP.md`, this handoff; three
+  saved `evals/results/stage5-*.json` local workflow reports.
+
 ## Current state and tests
 
 Branch `main` tracks `origin/main`. The full default suite passed:
-**84 passed, 2 skipped** (`.venv/bin/pytest -q`). The two opt-in PostgreSQL
-integration tests also passed separately with `RUN_POSTGRES_INTEGRATION=1`.
-Real Stage 4 CLI runs used PostgreSQL and Ollama. `git diff --check` passed.
+**100 passed, 2 skipped** (`.venv/bin/pytest -q`).
+All three opt-in PostgreSQL integration tests passed separately with
+`RUN_POSTGRES_INTEGRATION=1`; the new one verifies scoped read denial for
+private, other-tenant, and superseded chunks. A real stdio MCP client test
+lists only the two tools and checks invalid-argument rejection. Recheck
+`git diff --check` after final documentation edits.
+
+Stage 5 measured runs:
+
+- `stage5-tool-comparison.json`: searched and read two named documents,
+  cited both; about 14.9 seconds, six model calls, 1,738 accounted tokens.
+- `stage5-three-source-comparison.json`: searched and read three documents,
+  answered retry limit/delay correctly, but cited only two named documents;
+  the incident finding cited the ownership guide rather than the runbook.
+  This is an answer-quality gap, not a three-source citation pass.
+- `stage5-clarification.json`: ambiguous question clarified without tools.
+
+Earlier Stage 4 evidence remains in the saved reports:
 
 - Three-source comparison cited payment incident on-call response, Mercury
   ownership, and current retry policy v2 (up to two retries, at least 30
@@ -119,18 +167,20 @@ env RUN_POSTGRES_INTEGRATION=1 .venv/bin/pytest -q tests/integration
 git diff --check
 ```
 
-Reproduce Stage 4 against the populated sample corpus:
+Reproduce Stage 5 against the populated sample corpus:
 
 ```bash
 .venv/bin/python -m app.agents.workflow \
   "Compare the payment incident runbook, service ownership guide, and current payment retry policy: who responds to a severity-one payment incident, who owns the payments platform, and what retry count and delay apply to payment submissions?" \
-  --output evals/results/stage4-three-source-comparison.json
+  --tools --output evals/results/stage5-three-source-comparison.json
 .venv/bin/python -m app.agents.workflow "What should I do next?" \
-  --output evals/results/stage4-clarification.json
+  --tools --output evals/results/stage5-clarification.json
+.venv/bin/python -m app.tools.mcp_server
 ```
 
-Alternatively POST `{"query":"...","top_k":3}` to `/ask/planned`. See
-`README.md` for setup and `docs/planning-policy.md` for the execution contract.
+Alternatively POST `{"query":"...","top_k":3}` to `/ask/tools`. The MCP
+command is for a trusted local stdio client; it will wait for protocol input.
+See `README.md` for setup and `docs/tool-policy.md` for the tool contract.
 The opt-in integration suite and local model/database runs need services;
 sandboxed sessions may need localhost approval. Do not casually overwrite
 saved reports when changing prompts.
@@ -139,10 +189,13 @@ saved reports when changing prompts.
 
 - Runtime budget is cooperative, not hard cancellation. Embedding token
   accounting is estimated; local compute cost is unmeasured.
-- Citation IDs and locations are checked, not semantic claim support. Title
-  matching is heuristic and may miss aliases. Three saved demonstrations are
+- Citation IDs and locations are checked, not semantic claim support. The
+  three-source Stage 5 run missed one named source in its final citations.
+  Title matching is heuristic and may miss aliases. Saved demonstrations are
   not a broad agent-quality benchmark.
-- No Stage 5 tool dispatcher/MCP; no Stage 6 persistent isolated memory; no
+- MCP is local stdio/public-scope only; no remote authentication. Tool time
+  limit checks are cooperative and do not forcibly cancel an in-flight call.
+- No Stage 6 persistent isolated memory; no
   Stage 7 evidence critic/retry; no Stage 8 authentication/enterprise access
   policies; no Stage 9 complete packaging/deployment/CI. `PUBLIC_SCOPE` is
   server-owned but is not user authentication. Do not use real enterprise data.
@@ -151,9 +204,10 @@ saved reports when changing prompts.
 
 ## Exact recommended next task
 
-Present Stage 4 for owner review. Explain typed goals,
-bounded server-validated plans, clarification, scoped search, citation-checked
-synthesis, why the model cannot choose arbitrary steps, measured runs, and
-limitations. Stop there. Only after owner review and explicit direction should
-a later session start Stage 5 (typed read-only tool interfaces/dispatcher and
-MCP boundary).
+Present Stage 5 for owner review. Explain the typed search/read contracts,
+model-selected read within the server allowlist, shared permission-scoped SQL,
+local stdio MCP boundary, redacted tool traces, tests, measured runs, and the
+three-source citation limitation. Stop there; do not start Stage 6 without
+explicit owner direction. After Stage 5 review, the exact next
+roadmap task is Stage 6 working/conversation memory with session isolation,
+retention/deletion, and evidence provenance.

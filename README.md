@@ -2,7 +2,7 @@
 
 A production-oriented knowledge agent that ingests enterprise documents, finds permission-scoped evidence, and answers questions with citations. The project is being built in nine stages, from a transparent RAG pipeline to planning, tools, memory, self-correction, guardrails, and operational deployment.
 
-**Current status:** Stages 1–4 are implemented pending owner review. Stage 3's held-out evaluation gates pass on a small local corpus, and Stage 4 adds an opt-in bounded, cited planning workflow. This is not a production-quality guarantee; Stages 5–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
+**Current status:** Stages 1–5 are implemented pending owner review. Stage 3's held-out evaluation gates pass on a small local corpus; Stage 4 adds bounded planning, and Stage 5 adds read-only tools plus a local stdio MCP adapter. This is not a production-quality guarantee; Stages 6–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
 
 ## Original project stages
 
@@ -12,7 +12,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 | 2 | Production retrieval: hybrid search and reranking | Implemented; vector is the measured default |
 | 3 | Evaluation: datasets, metrics, quality gates | Implemented; all acceptance gates pass; pending owner review |
 | 4 | Goal analysis and planning | Implemented; pending owner review |
-| 5 | Tools and MCP | Planned |
+| 5 | Tools and MCP | Implemented; pending owner review |
 | 6 | Working and conversation memory | Planned |
 | 7 | Self-correction and evidence verification | Planned |
 | 8 | Guardrails and enterprise access controls | Planned |
@@ -52,9 +52,11 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 ### Stage 5 — Tools
 
-**Planned:** Give the agent a small allowlist of typed, read-only tools, initially document search and document reading. Validate tool arguments, enforce permissions, limit calls, and return controlled errors. Add MCP integration where it supports the project goals.
+**Built:** `POST /ask/tools` routes bounded search through a typed dispatcher, lets the model choose up to three scoped chunk IDs to read, then synthesizes cited findings. The only tools are `search_documents` and `read_document_chunks`. Both validate arguments and preserve the server's document scope. The local stdio MCP server exposes the same dispatcher, with no network listener or write tools. See [tool policy](docs/tool-policy.md).
 
-**Target demonstration:** The agent selects an appropriate search tool, uses its result as evidence, and handles invalid arguments or tool failure safely.
+**Measured demonstration:** A local two-document run selected and read evidence from both named documents and cited each. A three-document run read three sources but cited only two in the final answer; source suitability remains an evidence-checking limitation. Invalid arguments, unknown tools, dependency failure, and unauthorized chunk reads return controlled errors. This is not an authenticated enterprise service.
+
+**Why this design:** Search returns short previews; full chunk text becomes answer evidence only after a scoped read. The model may select from returned chunk IDs, but the server owns the tool allowlist, argument validation, access scope, and budgets. The default tool workflow allows up to three searches, one read of up to three chunks, and synthesis; see [tool policy](docs/tool-policy.md) for exact limits and failure behavior.
 
 ### Stage 6 — Memory
 
@@ -84,7 +86,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 Stages 1–8 describe the learning and feature milestones; Stage 9 covers production packaging and operations. Remaining production work includes:
 
-- Review and accept completed Stage 4; continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
+- Review and accept completed Stage 5; continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
 - Add CI for tests and evaluation gates; document migrations and rollback.
 - Finish the application container, deployment configuration, secrets handling, structured logs, request tracing, metrics, readiness probes, backups, and recovery procedures.
 - Test realistic load, failure recovery, and access-control boundaries.
@@ -111,13 +113,13 @@ Question ───────────────────┤
                              ▼
                  Answer with citations or abstain
 
-Complex question → Typed goal → Validated search plan → Scoped evidence
+Complex question → Typed goal → Validated search plan → Scoped search tool
                                                │
                                                ▼
-                                  Cited synthesis / clarification
+                                  Selected scoped read → Cited synthesis
 ```
 
-Stage 4 adds the opt-in planning path. Stages 5–7 add tools, memory, and bounded evidence checks. Stage 8 applies access and safety controls across the workflow.
+Stage 4 adds the opt-in planning path; Stage 5 adds the tool-enabled path. Stages 6–7 add memory and bounded evidence checks. Stage 8 applies access and safety controls across the workflow.
 
 ## Technology
 
@@ -127,6 +129,7 @@ Stage 4 adds the opt-in planning path. Stages 5–7 add tools, memory, and bound
 - PostgreSQL full-text search, reciprocal rank fusion
 - Sentence Transformers cross-encoder for optional reranking
 - PyMuPDF, python-docx, tiktoken
+- Official Python MCP SDK for the local stdio tool adapter
 - Docker Compose and pytest
 
 ## Run locally
@@ -178,6 +181,9 @@ Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama
    RUN_POSTGRES_INTEGRATION=1 uv run pytest -q tests/integration
    ```
 
+   On the current Stage 5 change set, the default suite passed 100 tests with
+   2 opt-in skips; all 3 PostgreSQL integration tests passed separately.
+
 Configuration is documented in [.env.example](.env.example). Do not commit a real `.env`.
 
 ## API overview
@@ -187,8 +193,21 @@ Configuration is documented in [.env.example](.env.example). Do not commit a rea
 - `POST /search`: retrieve evidence without answer generation.
 - `POST /ask`: answer from retrieved evidence with citations or abstain.
 - `POST /ask/planned`: analyze a goal, run a bounded read-only search plan, and return cited findings or a clarification. Body: `{"query":"...","top_k":3}`; response includes `state`, `answer`, `citations`, `goal`, `plan`, `trace`, `usage`, and `metadata`.
+- `POST /ask/tools`: use the validated read-only search and chunk-reading tools for the same bounded answer workflow. The body is `{"query":"...","top_k":3}`; caller-supplied scope is rejected.
 
 Use the OpenAPI page at `/docs` for request schemas and response examples. Available retrieval settings and filters are defined by the API request model.
+
+For example, after ingesting the sample corpus:
+
+```bash
+curl -sS -X POST http://127.0.0.1:8000/ask/tools \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"Compare the payment incident runbook and service ownership guide: who responds to a severity-one payment incident and who owns the payments platform?","top_k":3}'
+```
+
+The response includes the cited answer, goal, plan, redacted tool-state trace,
+usage, and model/limit metadata. An underspecified question can return a
+clarification without calling tools.
 
 ## Evaluation commands
 
@@ -224,6 +243,34 @@ uv run python -m app.agents.workflow \
   --output evals/results/stage4-three-source-comparison.json
 ```
 
+To reproduce the Stage 5 two-document tool run, use:
+
+```bash
+uv run python -m app.agents.workflow \
+  "Compare the payment incident runbook and service ownership guide: who responds to a severity-one payment incident and who owns the payments platform?" \
+  --tools --output evals/results/stage5-tool-comparison.json
+```
+
+The saved three-source and clarification runs are in `evals/results/stage5-*.json`.
+These are local examples, not a Stage 5 quality gate; the three-source run
+missed one named document in its final citations.
+
+## Local MCP server
+
+A trusted local MCP client can launch the read-only server from the repository
+root using:
+
+```bash
+uv run python -m app.tools.mcp_server
+```
+
+This is a stdio protocol process, not an interactive shell or HTTP service;
+it waits for a client to send MCP messages. It exposes only `search_documents`
+and `read_document_chunks`, both backed by the same validated dispatcher as
+`/ask/tools`. Its scope is fixed to public documents. Do not expose it over a
+network or use it for private enterprise data; user authentication and
+delegated tenant access are not implemented yet.
+
 ## Project documents
 
 - [Detailed status and production checklist](PROJECT_ROADMAP.md)
@@ -232,6 +279,7 @@ uv run python -m app.agents.workflow \
 - [Retrieval and reranking measurements](docs/retrieval-policy.md)
 - [Evaluation methodology and split discipline](docs/evaluation-policy.md)
 - [Stage 4 planning policy and measured examples](docs/planning-policy.md)
+- [Stage 5 tool contracts, MCP boundary, and measured limitations](docs/tool-policy.md)
 
 ## Scope and limitations
 

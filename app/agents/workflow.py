@@ -15,17 +15,20 @@ from app.agents.synthesizer import (
     SYNTHESIS_PROMPT_VERSION, SYNTHESIS_SYSTEM_PROMPT,
     render_synthesis, synthesize_findings,
 )
+from app.agents.tool_selector import TOOL_SELECTION_PROMPT_VERSION, select_tool
 from app.core.config import get_settings
 from app.generation.context_builder import build_context
 from app.retrieval.reranker import deduplicate_candidates
 from app.retrieval.scope import PUBLIC_SCOPE, RetrievalScope
 from app.retrieval.vector_search import search_chunks
+from app.tools.dispatcher import ToolDispatcher, ToolError
 
 
 ABSTENTION = "The available documents do not contain enough information."
 State = Literal[
     "received", "analyzing", "planning", "searching", "searched",
-    "evidence_selected", "synthesizing", "completed", "clarification", "failed",
+    "evidence_selected", "selecting_tool", "reading", "read", "tool_failed",
+    "synthesizing", "completed", "clarification", "failed",
 ]
 
 
@@ -34,6 +37,9 @@ class WorkflowEvent(BaseModel):
     elapsed_ms: float = Field(ge=0)
     step_id: str | None = None
     result_count: int | None = None
+    tool_name: str | None = None
+    tool_status: str | None = None
+    argument_summary: dict[str, int] | None = None
 
 
 class WorkflowUsage(BaseModel):
@@ -60,6 +66,8 @@ class WorkflowMetadata(BaseModel):
     max_model_calls: int
     max_tokens: int
     max_runtime_seconds: int
+    tool_selection_prompt_version: str | None = None
+    max_tool_calls: int | None = None
 
 
 class WorkflowResult(BaseModel):
@@ -137,8 +145,21 @@ def _merge_step_results(result_sets: list[list[dict]]) -> list[dict]:
     return deduplicate_candidates(interleaved)
 
 
-def _restrict_to_named_documents(question: str, candidates: list[dict]) -> list[dict]:
-    """Honor document names supplied by the user when two titles resolve."""
+def _merge_tool_results(result_sets: list[list[dict]]) -> list[dict]:
+    """Interleave preview results without needing their full document text."""
+    merged = []
+    seen = set()
+    for rank in range(max((len(results) for results in result_sets), default=0)):
+        for results in result_sets:
+            if rank < len(results) and results[rank]["chunk_id"] not in seen:
+                item = results[rank]
+                seen.add(item["chunk_id"])
+                merged.append(item)
+    return merged
+
+
+def _named_documents(question: str, candidates: list[dict]) -> set[str]:
+    """Resolve explicit names conservatively within already scoped candidates."""
     names = {candidate["document"] for candidate in candidates}
     lowered_question = question.casefold()
     exact = {name for name in names if name.casefold() in lowered_question}
@@ -154,12 +175,32 @@ def _restrict_to_named_documents(question: str, candidates: list[dict]) -> list[
             matched.add(name)
     selected_names = exact | matched
     if exact or len(selected_names) >= 2:
-        return [item for item in candidates if item["document"] in selected_names]
-    return candidates
+        return selected_names
+    return set()
+
+
+def _restrict_to_named_documents(question: str, candidates: list[dict]) -> list[dict]:
+    """Honor document names supplied by the user when titles resolve."""
+    selected_names = _named_documents(question, candidates)
+    return ([item for item in candidates if item["document"] in selected_names]
+            if selected_names else candidates)
 
 
 def run_planned_answer(
     question: str, *, top_k: int = 3, scope: RetrievalScope = PUBLIC_SCOPE,
+) -> WorkflowResult:
+    return _run_answer(question, top_k=top_k, scope=scope, use_tools=False)
+
+
+def run_tool_answer(
+    question: str, *, top_k: int = 3, scope: RetrievalScope = PUBLIC_SCOPE,
+) -> WorkflowResult:
+    """Use allowlisted search and scoped read tools before synthesis."""
+    return _run_answer(question, top_k=top_k, scope=scope, use_tools=True)
+
+
+def _run_answer(
+    question: str, *, top_k: int, scope: RetrievalScope, use_tools: bool,
 ) -> WorkflowResult:
     if not question.strip() or len(question) > 2000:
         raise ValueError("question must contain 1 to 2000 characters")
@@ -167,6 +208,11 @@ def run_planned_answer(
         raise ValueError("top_k must be between 1 and 3")
 
     settings = get_settings()
+    if use_tools:
+        settings = settings.model_copy(update={
+            "workflow_max_steps": settings.tool_workflow_max_steps,
+            "workflow_max_model_calls": settings.tool_workflow_max_model_calls,
+        })
     started = perf_counter()
     budget = _Budget(settings, started)
     trace: list[WorkflowEvent] = []
@@ -181,11 +227,18 @@ def run_planned_answer(
         max_model_calls=settings.workflow_max_model_calls,
         max_tokens=settings.workflow_max_tokens,
         max_runtime_seconds=settings.workflow_max_runtime_seconds,
+        tool_selection_prompt_version=(
+            TOOL_SELECTION_PROMPT_VERSION if use_tools else None
+        ),
+        max_tool_calls=settings.tool_workflow_max_tool_calls if use_tools else None,
     )
 
-    def transition(state: State, *, step_id=None, result_count=None):
+    def transition(state: State, *, step_id=None, result_count=None,
+                   tool_name=None, tool_status=None, argument_summary=None):
         trace.append(WorkflowEvent(
             state=state, step_id=step_id, result_count=result_count,
+            tool_name=tool_name, tool_status=tool_status,
+            argument_summary=argument_summary,
             elapsed_ms=(perf_counter() - started) * 1000,
         ))
 
@@ -212,22 +265,71 @@ def run_planned_answer(
 
         # Hold the scope's timestamp fixed across all searches in the plan.
         fixed_scope = replace(scope, as_of=scope.normalized_as_of())
+        dispatcher = ToolDispatcher(
+            fixed_scope, max_calls=settings.tool_workflow_max_tool_calls,
+            max_elapsed_seconds=settings.tool_max_elapsed_seconds,
+        ) if use_tools else None
         result_sets = []
         for step in plan.steps:
             if not isinstance(step, SearchStep):
                 continue
-            transition("searching", step_id=step.step_id)
+            transition("searching", step_id=step.step_id,
+                       tool_name="search_documents" if use_tools else None,
+                       argument_summary={"query_chars": len(step.query), "top_k": top_k}
+                       if use_tools else None)
             budget.require_tokens(_estimate_tokens(step.query))
             budget.call()  # vector retrieval makes one embedding-model call
-            results = search_chunks(step.query, top_k=top_k, scope=fixed_scope)
+            if dispatcher:
+                try:
+                    observation = dispatcher.execute(
+                        "search_documents", {"query": step.query, "top_k": top_k},
+                    )
+                except ToolError as error:
+                    transition("tool_failed", step_id=step.step_id,
+                               tool_name="search_documents", tool_status=error.code)
+                    raise
+                results = observation.result
+            else:
+                results = search_chunks(step.query, top_k=top_k, scope=fixed_scope)
             budget.add_tokens(_estimate_tokens(step.query))
             result_sets.append(results)
-            transition("searched", step_id=step.step_id, result_count=len(results))
+            transition("searched", step_id=step.step_id, result_count=len(results),
+                       tool_name="search_documents" if use_tools else None,
+                       tool_status="ok" if use_tools else None)
 
         candidates = _restrict_to_named_documents(
-            question, _merge_step_results(result_sets),
+            question, (_merge_tool_results(result_sets) if use_tools
+                       else _merge_step_results(result_sets)),
         )
         transition("evidence_selected", result_count=len(candidates))
+        if dispatcher and candidates:
+            if len(plan.steps) + 1 > settings.workflow_max_steps:
+                raise WorkflowBudgetExceeded("workflow step budget exceeded")
+            transition("selecting_tool")
+            budget.call()
+            required_documents = _named_documents(question, candidates)
+            if len(required_documents) > 3:
+                required_documents = set()
+            choice, selection_usage = select_tool(
+                question, analysis.goal, candidates,
+                required_documents=required_documents,
+            )
+            budget.add_tokens(
+                selection_usage["prompt_tokens"] + selection_usage["completion_tokens"]
+            )
+            transition("reading", step_id="read_1", tool_name=choice.tool,
+                       argument_summary={"chunk_count": len(choice.chunk_ids)})
+            try:
+                observation = dispatcher.execute(
+                    choice.tool, {"chunk_ids": choice.chunk_ids},
+                )
+            except ToolError as error:
+                transition("tool_failed", step_id="read_1", tool_name=choice.tool,
+                           tool_status=error.code)
+                raise
+            candidates = observation.result
+            transition("read", step_id="read_1", tool_name=choice.tool,
+                       tool_status="ok", result_count=observation.count)
         transition("synthesizing", step_id=plan.steps[-1].step_id)
         if candidates:
             evidence = build_context(candidates)
@@ -273,10 +375,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run a bounded planned answer.")
     parser.add_argument("question")
     parser.add_argument("--top-k", type=int, default=3, choices=(1, 2, 3))
+    parser.add_argument("--tools", action="store_true", help="Use Stage 5 read-only tools")
     parser.add_argument("--output", type=Path)
     arguments = parser.parse_args()
     try:
-        result = run_planned_answer(arguments.question, top_k=arguments.top_k)
+        runner = run_tool_answer if arguments.tools else run_planned_answer
+        result = runner(arguments.question, top_k=arguments.top_k)
     except WorkflowRunError as error:
         print(json.dumps({
             "error_type": type(error.cause).__name__,

@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stages 1–4 are implemented pending owner review. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, and an opt-in bounded planning workflow. It is not yet a complete agent or a production-ready enterprise service.
+Current status: Stages 1–5 are implemented pending owner review. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, and read-only tools with a local stdio MCP adapter. It is not yet a complete agent or a production-ready enterprise service.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -77,6 +77,15 @@ Status is based on inspected repository code and recorded evaluation results. Em
   permission-scoped and final citations are checked against source IDs.
 - See `docs/planning-policy.md` and `evals/results/stage4-*.json` for the
   execution contract, measured examples, and limitations.
+
+### Read-only tools and MCP
+
+- Opt-in `/ask/tools` routes planned search through a validated, scoped tool
+  dispatcher, then selects and reads authorized chunks before synthesis.
+- A local stdio MCP server exposes the same read-only dispatcher and public
+  scope. It is not an authenticated network service.
+- See `docs/tool-policy.md` and `evals/results/stage5-*.json` for boundaries,
+  measured examples, and the remaining citation-quality gap.
 
 ## Recorded results and their limits
 
@@ -198,17 +207,25 @@ search. The three-document run stayed within four steps, six model calls,
 
 ### 5. Tools and MCP
 
-Status: ordinary search functions exist; agent tool selection/execution is not implemented.
+Status: completed October 4, 2026; pending owner review.
 
-- [ ] Define typed search and document-reading tool interfaces.
-- [ ] Add a validated dispatcher for tool selection and arguments.
-- [ ] Enforce allowlists, access controls, timeouts, and safe tool-error propagation.
-- [ ] Keep the initial tools read-only; require explicit authorization for future state-changing tools.
-- [ ] Integrate MCP where required by the original learning scope and verify the server/tool boundary.
-- [ ] Capture tool inputs/results in workflow traces with appropriate redaction.
-- [ ] Test malformed arguments, unknown tools, tool failures, and unauthorized access.
+- [x] Define typed search and document-reading tool interfaces.
+- [x] Add a validated dispatcher for tool selection and arguments.
+- [x] Enforce allowlists, scope controls, cooperative time limits, and safe tool-error propagation.
+- [x] Keep the initial tools read-only; require explicit authorization for future state-changing tools.
+- [x] Integrate a local stdio MCP adapter and verify the server/tool boundary.
+- [x] Capture tool input sizes, result counts, statuses, and timing in traces without raw content.
+- [x] Test malformed arguments, unknown tools, tool failures, and unauthorized access.
 
 Completion evidence: the agent selects and uses authorized tools correctly, including controlled failure behavior.
+
+Evidence: the default suite passes 100 tests (2 opt-in skips), and all 3
+PostgreSQL integration tests pass separately. A real stdio MCP client discovers
+only the two read-only tools and receives a controlled argument error. Local
+two- and three-document Ollama/PostgreSQL runs search then read scoped chunks;
+the two-document answer cites both named sources. The three-document answer
+reads three sources but cites only two, a known answer-quality limitation for
+Stage 7 evidence checking. See `docs/tool-policy.md`.
 
 ### 6. Working and conversation memory
 

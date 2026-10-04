@@ -1,0 +1,165 @@
+{
+  "state": "completed",
+  "answer": "- Name of the person/team that responds to a severity-one payment incident: The primary on-call responder from the Mercury team responds to a severity-one payment incident. [S1]\n- Name of the owner of the payments platform: The Mercury team owns the payments platform. [S2]",
+  "citations": [
+    {
+      "source_id": "S1",
+      "document": "payment-incident-runbook.md",
+      "section": "Severity-one payment incident"
+    },
+    {
+      "source_id": "S2",
+      "document": "service-ownership.md",
+      "section": "Payments platform"
+    }
+  ],
+  "goal": {
+    "objective": "Identify the responsible parties for a severity-one payment incident and the owner of the payments platform based on the payment incident runbook and service ownership guide",
+    "entities": [],
+    "deliverables": [
+      "Name of the person/team that responds to a severity-one payment incident",
+      "Name of the owner of the payments platform"
+    ],
+    "constraints": [
+      "The comparison must be based on the payment incident runbook and service ownership guide"
+    ]
+  },
+  "plan": {
+    "goal": {
+      "objective": "Identify the responsible parties for a severity-one payment incident and the owner of the payments platform based on the payment incident runbook and service ownership guide",
+      "entities": [],
+      "deliverables": [
+        "Name of the person/team that responds to a severity-one payment incident",
+        "Name of the owner of the payments platform"
+      ],
+      "constraints": [
+        "The comparison must be based on the payment incident runbook and service ownership guide"
+      ]
+    },
+    "steps": [
+      {
+        "step_id": "search_1",
+        "type": "search",
+        "purpose": "Name of the person/team that responds to a severity-one payment incident",
+        "query": "What is the name of the person/team that responds to a severity-one payment incident according to the payment incident runbook?",
+        "deliverable_index": 0
+      },
+      {
+        "step_id": "search_2",
+        "type": "search",
+        "purpose": "Name of the owner of the payments platform",
+        "query": "What is the name of the owner of the payments platform according to the service ownership guide?",
+        "deliverable_index": 1
+      },
+      {
+        "step_id": "synthesis",
+        "type": "synthesize",
+        "purpose": "Synthesize a cited answer from the retrieved evidence"
+      }
+    ]
+  },
+  "trace": [
+    {
+      "state": "received",
+      "elapsed_ms": 0.010917079634964466
+    },
+    {
+      "state": "analyzing",
+      "elapsed_ms": 0.014833989553153515
+    },
+    {
+      "state": "planning",
+      "elapsed_ms": 5605.748209054582
+    },
+    {
+      "state": "searching",
+      "elapsed_ms": 7391.695292084478,
+      "step_id": "search_1",
+      "tool_name": "search_documents",
+      "argument_summary": {
+        "query_chars": 127,
+        "top_k": 3
+      }
+    },
+    {
+      "state": "searched",
+      "elapsed_ms": 8798.516292008571,
+      "step_id": "search_1",
+      "result_count": 3,
+      "tool_name": "search_documents",
+      "tool_status": "ok"
+    },
+    {
+      "state": "searching",
+      "elapsed_ms": 8798.568999976851,
+      "step_id": "search_2",
+      "tool_name": "search_documents",
+      "argument_summary": {
+        "query_chars": 96,
+        "top_k": 3
+      }
+    },
+    {
+      "state": "searched",
+      "elapsed_ms": 8949.042292078957,
+      "step_id": "search_2",
+      "result_count": 3,
+      "tool_name": "search_documents",
+      "tool_status": "ok"
+    },
+    {
+      "state": "evidence_selected",
+      "elapsed_ms": 8949.899542029016,
+      "result_count": 3
+    },
+    {
+      "state": "selecting_tool",
+      "elapsed_ms": 8949.944916996174
+    },
+    {
+      "state": "reading",
+      "elapsed_ms": 12048.954459023662,
+      "step_id": "read_1",
+      "tool_name": "read_document_chunks",
+      "argument_summary": {
+        "chunk_count": 2
+      }
+    },
+    {
+      "state": "read",
+      "elapsed_ms": 12053.635374992155,
+      "step_id": "read_1",
+      "result_count": 2,
+      "tool_name": "read_document_chunks",
+      "tool_status": "ok"
+    },
+    {
+      "state": "synthesizing",
+      "elapsed_ms": 12053.664334001951,
+      "step_id": "synthesis"
+    },
+    {
+      "state": "completed",
+      "elapsed_ms": 14882.57550005801
+    }
+  ],
+  "usage": {
+    "model_calls": 6,
+    "tokens": 1738,
+    "elapsed_ms": 14882.659499999136
+  },
+  "metadata": {
+    "goal_prompt_version": "4.0.0",
+    "plan_prompt_version": "4.0.0",
+    "synthesis_prompt_version": "4.0.0",
+    "generation_model": "qwen3:4b",
+    "embedding_model": "embeddinggemma",
+    "retrieval_method": "vector",
+    "max_steps": 5,
+    "max_model_calls": 7,
+    "max_tokens": 12000,
+    "max_runtime_seconds": 600,
+    "tool_selection_prompt_version": "5.0.0",
+    "max_tool_calls": 4
+  }
+}
