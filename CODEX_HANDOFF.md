@@ -55,9 +55,9 @@ enterprise service.
 - Locally hosted inference has no per-token API charge; reports state `$0` API
   cost, but do not claim compute is free. Hardware and energy costs are not
   measured.
-- Do not commit or push automatically. The user previously asked for review at
-  each stage; wait for review before proceeding to the next stage. Stage 3 is
-  implemented locally but not committed or pushed.
+- The user requested the Stage 3 push. Its implementation was committed as
+  `91df72d` and pushed to `origin/main`. Review each stage before beginning
+  the next one.
 
 ## Completed functionality in this working tree
 
@@ -108,9 +108,9 @@ enterprise service.
 
 ## Current state and measured results
 
-Branch is `main`, tracking `origin/main`; last committed baseline is
-`959fcdd feat: add production retrieval and cross-encoder reranking`. Stage 3
-changes are local, uncommitted, and unpushed. No Stage 4 work has been started.
+Branch is `main`, tracking `origin/main`. Stage 3 implementation commit
+`91df72d feat: complete stage 3 evaluation and quality gates` was pushed to
+GitHub. No Stage 4 work has been started.
 
 - Unit suite: **65 passed, 2 skipped** (`.venv/bin/pytest -q`). Skips are
   environment-dependent tests; use the opt-in PostgreSQL integration command
@@ -210,9 +210,9 @@ rerunning it for acceptance.
 ## Exact recommended next task
 
 Review Stage 3's implementation, reports, measured trade-offs, and the updated
-`README.md`/`PROJECT_ROADMAP.md`, then approve or request adjustments. Do not
-commit/push unless the owner asks. Only after Stage 3 review is approved, the
-exact next roadmap task is Stage 4: define typed goal/plan schemas (objective,
+`README.md`/`PROJECT_ROADMAP.md`, then approve or request adjustments. After
+Stage 3 review is approved, the next roadmap task is Stage 4: define typed
+goal/plan schemas (objective,
 entities, deliverables, constraints, bounded steps), decompose complex queries,
 and request clarification when intent is underspecified. Stage 4 has not been
 started in this change set.
