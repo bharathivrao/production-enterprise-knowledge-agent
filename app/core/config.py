@@ -40,6 +40,13 @@ class Settings(BaseSettings):
     tool_workflow_max_model_calls: int = Field(default=7, ge=4, le=10)
     tool_workflow_max_tool_calls: int = Field(default=4, ge=2, le=4)
     tool_max_elapsed_seconds: int = Field(default=120, ge=1, le=600)
+    session_ttl_hours: int = Field(default=24, ge=1, le=168)
+    session_max_stored_turns: int = Field(default=12, ge=2, le=50)
+    session_history_turns: int = Field(default=6, ge=1, le=20)
+    session_history_tokens: int = Field(default=1200, ge=128, le=4000)
+    session_max_model_calls: int = Field(default=8, ge=2, le=12)
+    session_max_tokens: int = Field(default=14000, ge=2048)
+    session_max_runtime_seconds: int = Field(default=750, ge=60)
 
     chunk_size: int = Field(default=400, ge=1)
     chunk_overlap: int = Field(default=50, ge=0)

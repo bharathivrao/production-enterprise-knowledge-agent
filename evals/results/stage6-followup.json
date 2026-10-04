@@ -1,0 +1,274 @@
+{
+  "scenario": "payment-platform-ownership-followup",
+  "passed": true,
+  "checks": {
+    "first_turn_grounded_in_incident_runbook": true,
+    "followup_resolves_payments_platform": true,
+    "followup_grounded_in_ownership_guide": true,
+    "two_turns_persisted": true,
+    "followup_uses_fresh_tool_search": true
+  },
+  "first_turn": {
+    "session_id": "bf182f0d-0d45-4789-9d09-ab6700887123",
+    "turn_id": "1c72064a-1d06-4bcd-913c-66c2528c49af",
+    "state": "completed",
+    "original_question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+    "resolved_question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+    "answer": "- Name of the responsible party for severity-one incidents in the payments platform: The primary on-call responder [S1]",
+    "citations": [
+      {
+        "source_id": "S1",
+        "document": "payment-incident-runbook.md",
+        "section": "Severity-one payment incident"
+      }
+    ],
+    "memory": {
+      "question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+      "resolved_question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+      "goal_objective": "Determine the responsible party for a severity-one incident on the payments platform based on the payment incident runbook",
+      "plan_step_ids": [
+        "search_1",
+        "synthesis"
+      ],
+      "tool_observations": [
+        {
+          "tool_name": "search_documents",
+          "status": "ok",
+          "result_count": 3
+        },
+        {
+          "tool_name": "read_document_chunks",
+          "status": "ok",
+          "result_count": 1
+        }
+      ],
+      "cited_sources": [
+        {
+          "source_id": "S1",
+          "document": "payment-incident-runbook.md",
+          "section": "Severity-one payment incident"
+        }
+      ],
+      "unresolved_questions": []
+    },
+    "trace": [
+      {
+        "state": "received",
+        "elapsed_ms": 0.018249964341521263
+      },
+      {
+        "state": "analyzing",
+        "elapsed_ms": 0.025415909476578236
+      },
+      {
+        "state": "planning",
+        "elapsed_ms": 2650.0235409475863
+      },
+      {
+        "state": "searching",
+        "elapsed_ms": 3510.745665989816,
+        "step_id": "search_1",
+        "tool_name": "search_documents",
+        "argument_summary": {
+          "query_chars": 124,
+          "top_k": 3
+        }
+      },
+      {
+        "state": "searched",
+        "elapsed_ms": 3639.997999998741,
+        "step_id": "search_1",
+        "result_count": 3,
+        "tool_name": "search_documents",
+        "tool_status": "ok"
+      },
+      {
+        "state": "evidence_selected",
+        "elapsed_ms": 3640.318415942602,
+        "result_count": 1
+      },
+      {
+        "state": "selecting_tool",
+        "elapsed_ms": 3640.3297499055043
+      },
+      {
+        "state": "reading",
+        "elapsed_ms": 4291.384040960111,
+        "step_id": "read_1",
+        "tool_name": "read_document_chunks",
+        "argument_summary": {
+          "chunk_count": 1
+        }
+      },
+      {
+        "state": "read",
+        "elapsed_ms": 4303.0555410077795,
+        "step_id": "read_1",
+        "result_count": 1,
+        "tool_name": "read_document_chunks",
+        "tool_status": "ok"
+      },
+      {
+        "state": "synthesizing",
+        "elapsed_ms": 4303.09583293274,
+        "step_id": "synthesis"
+      },
+      {
+        "state": "completed",
+        "elapsed_ms": 5419.669499970041
+      }
+    ],
+    "usage": {
+      "model_calls": 5,
+      "tokens": 1105,
+      "elapsed_ms": 5494.052708963864
+    },
+    "workflow_metadata": {
+      "goal_prompt_version": "4.0.0",
+      "plan_prompt_version": "4.0.0",
+      "synthesis_prompt_version": "4.0.0",
+      "generation_model": "qwen3:4b",
+      "embedding_model": "embeddinggemma",
+      "retrieval_method": "vector",
+      "max_steps": 5,
+      "max_model_calls": 7,
+      "max_tokens": 12000,
+      "max_runtime_seconds": 600,
+      "tool_selection_prompt_version": "5.1.0",
+      "max_tool_calls": 4
+    },
+    "followup_prompt_version": "6.2.0"
+  },
+  "followup_turn": {
+    "session_id": "bf182f0d-0d45-4789-9d09-ab6700887123",
+    "turn_id": "58dbde45-e9d5-43d8-99b7-7fe5b1cb0327",
+    "state": "completed",
+    "original_question": "Who owns that service?",
+    "resolved_question": "According to the available documents, Who owns the payments platform service?",
+    "answer": "- Name of the entity that owns the payments platform service: Mercury [S1]",
+    "citations": [
+      {
+        "source_id": "S1",
+        "document": "service-ownership.md",
+        "section": "Payments platform"
+      }
+    ],
+    "memory": {
+      "question": "Who owns that service?",
+      "resolved_question": "According to the available documents, Who owns the payments platform service?",
+      "goal_objective": "Identify the owner of the payments platform service",
+      "plan_step_ids": [
+        "search_1",
+        "synthesis"
+      ],
+      "tool_observations": [
+        {
+          "tool_name": "search_documents",
+          "status": "ok",
+          "result_count": 3
+        },
+        {
+          "tool_name": "read_document_chunks",
+          "status": "ok",
+          "result_count": 1
+        }
+      ],
+      "cited_sources": [
+        {
+          "source_id": "S1",
+          "document": "service-ownership.md",
+          "section": "Payments platform"
+        }
+      ],
+      "unresolved_questions": []
+    },
+    "trace": [
+      {
+        "state": "received",
+        "elapsed_ms": 0.024124979972839355
+      },
+      {
+        "state": "analyzing",
+        "elapsed_ms": 0.0398330157622695
+      },
+      {
+        "state": "planning",
+        "elapsed_ms": 2083.1455000443384
+      },
+      {
+        "state": "searching",
+        "elapsed_ms": 2983.775125001557,
+        "step_id": "search_1",
+        "tool_name": "search_documents",
+        "argument_summary": {
+          "query_chars": 71,
+          "top_k": 3
+        }
+      },
+      {
+        "state": "searched",
+        "elapsed_ms": 3096.6680420096964,
+        "step_id": "search_1",
+        "result_count": 3,
+        "tool_name": "search_documents",
+        "tool_status": "ok"
+      },
+      {
+        "state": "evidence_selected",
+        "elapsed_ms": 3096.8304169364274,
+        "result_count": 3
+      },
+      {
+        "state": "selecting_tool",
+        "elapsed_ms": 3096.8420419376343
+      },
+      {
+        "state": "reading",
+        "elapsed_ms": 4262.594708008692,
+        "step_id": "read_1",
+        "tool_name": "read_document_chunks",
+        "argument_summary": {
+          "chunk_count": 1
+        }
+      },
+      {
+        "state": "read",
+        "elapsed_ms": 4266.579375020228,
+        "step_id": "read_1",
+        "result_count": 1,
+        "tool_name": "read_document_chunks",
+        "tool_status": "ok"
+      },
+      {
+        "state": "synthesizing",
+        "elapsed_ms": 4266.605042037554,
+        "step_id": "synthesis"
+      },
+      {
+        "state": "completed",
+        "elapsed_ms": 5500.830375007354
+      }
+    ],
+    "usage": {
+      "model_calls": 6,
+      "tokens": 1384,
+      "elapsed_ms": 6444.831958971918
+    },
+    "workflow_metadata": {
+      "goal_prompt_version": "4.0.0",
+      "plan_prompt_version": "4.0.0",
+      "synthesis_prompt_version": "4.0.0",
+      "generation_model": "qwen3:4b",
+      "embedding_model": "embeddinggemma",
+      "retrieval_method": "vector",
+      "max_steps": 5,
+      "max_model_calls": 7,
+      "max_tokens": 12000,
+      "max_runtime_seconds": 600,
+      "tool_selection_prompt_version": "5.1.0",
+      "max_tool_calls": 4
+    },
+    "followup_prompt_version": "6.2.0"
+  },
+  "session_deleted_after_run": true
+}

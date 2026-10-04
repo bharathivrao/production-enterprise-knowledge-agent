@@ -6,7 +6,7 @@ import pytest
 from app.agents.goal_analyzer import Goal, GoalAnalysis
 from app.agents.planner import Plan, SearchStep, SynthesizeStep
 from app.agents.synthesizer import Finding, SynthesisDraft
-from app.agents.tool_selector import ToolChoice
+from app.agents.tool_selector import SelectedTool
 from app.agents.workflow import WorkflowRunError, run_tool_answer
 from app.tools.dispatcher import ToolError, ToolObservation
 
@@ -53,7 +53,7 @@ def test_tool_workflow_selects_scoped_read_and_cites_both_documents():
         patch("app.agents.workflow.plan_goal", return_value=(PLAN, USAGE)),
         patch("app.agents.workflow.ToolDispatcher", return_value=dispatcher) as boundary,
         patch("app.agents.workflow.select_tool", return_value=(
-            ToolChoice(tool="read_document_chunks", chunk_ids=ids), USAGE,
+            SelectedTool(tool="read_document_chunks", chunk_ids=ids), USAGE,
         )),
         patch("app.agents.workflow.synthesize_findings", return_value=(
             SynthesisDraft(findings=[

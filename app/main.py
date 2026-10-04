@@ -7,7 +7,7 @@ from psycopg_pool import PoolTimeout
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.api import health, ingest, query
+from app.api import health, ingest, query, sessions
 from app.core.config import get_settings
 from app.core.model_client import model_client
 from app.db.database import close_database_pool, start_database_pool
@@ -70,6 +70,7 @@ async def handle_database_pool_timeout(request: Request, error: PoolTimeout):
 app.include_router(health.router)
 app.include_router(query.router)
 app.include_router(ingest.router)
+app.include_router(sessions.router)
 
 
 @app.get("/")

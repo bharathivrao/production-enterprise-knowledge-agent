@@ -162,10 +162,12 @@ def _named_documents(question: str, candidates: list[dict]) -> set[str]:
     """Resolve explicit names conservatively within already scoped candidates."""
     names = {candidate["document"] for candidate in candidates}
     lowered_question = question.casefold()
+    normalized_question = " ".join(re.findall(r"[a-z0-9]+", lowered_question))
     exact = {name for name in names if name.casefold() in lowered_question}
 
     question_words = set(re.findall(r"[a-z0-9]+", lowered_question))
     matched = set()
+    phrase_matched = set()
     for name in names:
         title_words = [
             word for word in re.findall(r"[a-z0-9]+", Path(name).stem.casefold())
@@ -173,9 +175,13 @@ def _named_documents(question: str, candidates: list[dict]) -> set[str]:
         ]
         if len(title_words) >= 2 and set(title_words) <= question_words:
             matched.add(name)
+            if " ".join(title_words) in normalized_question:
+                phrase_matched.add(name)
     selected_names = exact | matched
     if exact or len(selected_names) >= 2:
         return selected_names
+    if phrase_matched:
+        return phrase_matched
     return set()
 
 

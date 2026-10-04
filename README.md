@@ -2,7 +2,7 @@
 
 A production-oriented knowledge agent that ingests enterprise documents, finds permission-scoped evidence, and answers questions with citations. The project is being built in nine stages, from a transparent RAG pipeline to planning, tools, memory, self-correction, guardrails, and operational deployment.
 
-**Current status:** Stages 1–5 are implemented pending owner review. Stage 3's held-out evaluation gates pass on a small local corpus; Stage 4 adds bounded planning, and Stage 5 adds read-only tools plus a local stdio MCP adapter. This is not a production-quality guarantee; Stages 6–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
+**Current status:** Stages 1–6 are implemented pending owner review. Stage 3's held-out evaluation gates pass on a small local corpus; Stages 4–6 add bounded planning, read-only tools, and opt-in conversation sessions. This is not a production-quality guarantee; Stages 7–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
 
 ## Original project stages
 
@@ -13,7 +13,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 | 3 | Evaluation: datasets, metrics, quality gates | Implemented; all acceptance gates pass; pending owner review |
 | 4 | Goal analysis and planning | Implemented; pending owner review |
 | 5 | Tools and MCP | Implemented; pending owner review |
-| 6 | Working and conversation memory | Planned |
+| 6 | Working and conversation memory | Implemented; pending owner review |
 | 7 | Self-correction and evidence verification | Planned |
 | 8 | Guardrails and enterprise access controls | Planned |
 | 9 | Packaging, deployment, and operations | Planned |
@@ -52,17 +52,19 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 ### Stage 5 — Tools
 
-**Built:** `POST /ask/tools` routes bounded search through a typed dispatcher, lets the model choose up to three scoped chunk IDs to read, then synthesizes cited findings. The only tools are `search_documents` and `read_document_chunks`. Both validate arguments and preserve the server's document scope. The local stdio MCP server exposes the same dispatcher, with no network listener or write tools. See [tool policy](docs/tool-policy.md).
+**Built:** `POST /ask/tools` routes bounded search through a typed dispatcher, lets the model choose up to three numbered scoped search results, maps those numbers to chunk IDs server-side, then reads and synthesizes cited findings. The only tools are `search_documents` and `read_document_chunks`. Both validate arguments and preserve the server's document scope. The local stdio MCP server exposes the same dispatcher, with no network listener or write tools. See [tool policy](docs/tool-policy.md).
 
 **Measured demonstration:** A local two-document run selected and read evidence from both named documents and cited each. A three-document run read three sources but cited only two in the final answer; source suitability remains an evidence-checking limitation. Invalid arguments, unknown tools, dependency failure, and unauthorized chunk reads return controlled errors. This is not an authenticated enterprise service.
 
-**Why this design:** Search returns short previews; full chunk text becomes answer evidence only after a scoped read. The model may select from returned chunk IDs, but the server owns the tool allowlist, argument validation, access scope, and budgets. The default tool workflow allows up to three searches, one read of up to three chunks, and synthesis; see [tool policy](docs/tool-policy.md) for exact limits and failure behavior.
+**Why this design:** Search returns short previews; full chunk text becomes answer evidence only after a scoped read. The model selects numbered candidates, while the server owns their IDs, the tool allowlist, argument validation, access scope, and budgets. The default tool workflow allows up to three searches, one read of up to three chunks, and synthesis; see [tool policy](docs/tool-policy.md) for exact limits and failure behavior.
 
 ### Stage 6 — Memory
 
-**Planned:** Keep bounded working state for a plan and its evidence, plus isolated conversation history for follow-up questions. Define storage, retention, expiration, and deletion. Preserve provenance so previous model answers are not mistaken for verified evidence.
+**Built:** Capability-protected PostgreSQL sessions, bounded per-request working state, recent-turn selection, structured follow-up resolution, expiry, reset, and deletion. A follow-up uses prior user questions and currently visible source titles to resolve references, then searches and reads evidence again under the current server scope. Prior generated answers are stored for display but never sent to the resolver as facts. See [memory policy](docs/memory-policy.md).
 
-**Target demonstration:** A follow-up resolves references from the same session without leaking context across users or sessions.
+**Measured demonstration:** A local two-turn run answered a severity-one payment incident question from the incident runbook, resolved “Who owns that service?” to the payments platform, ran a fresh tool search, and cited the ownership guide. All five scenario checks passed. PostgreSQL tests cover wrong-token and wrong-tenant isolation, concurrent writes, retention, expiry, reset, deletion, and source-title reauthorization.
+
+**Important limit:** The session token is only an opaque bearer capability, not a user identity. Sessions currently use the public server scope; authentication, rate limiting, delegated tenant access, and production sensitive-data policy are Stage 8 work.
 
 ### Stage 7 — Self-correction
 
@@ -86,7 +88,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 Stages 1–8 describe the learning and feature milestones; Stage 9 covers production packaging and operations. Remaining production work includes:
 
-- Review and accept completed Stage 5; continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
+- Review and accept completed Stage 6; continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
 - Add CI for tests and evaluation gates; document migrations and rollback.
 - Finish the application container, deployment configuration, secrets handling, structured logs, request tracing, metrics, readiness probes, backups, and recovery procedures.
 - Test realistic load, failure recovery, and access-control boundaries.
@@ -117,9 +119,11 @@ Complex question → Typed goal → Validated search plan → Scoped search tool
                                                │
                                                ▼
                                   Selected scoped read → Cited synthesis
+
+Session token + recent user turns → Follow-up resolver → Fresh scoped workflow
 ```
 
-Stage 4 adds the opt-in planning path; Stage 5 adds the tool-enabled path. Stages 6–7 add memory and bounded evidence checks. Stage 8 applies access and safety controls across the workflow.
+Stage 4 adds the opt-in planning path; Stage 5 adds the tool-enabled path; Stage 6 adds bounded sessions. Stage 7 adds evidence checks. Stage 8 applies identity, access, and safety controls across the workflow.
 
 ## Technology
 
@@ -181,10 +185,11 @@ Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama
    RUN_POSTGRES_INTEGRATION=1 uv run pytest -q tests/integration
    ```
 
-   On the current Stage 5 change set, the default suite passed 100 tests with
-   2 opt-in skips; all 3 PostgreSQL integration tests passed separately.
+   On the current Stage 6 change set, the default suite passed 115 tests with
+   3 opt-in skips; all 6 PostgreSQL integration tests passed separately.
 
 Configuration is documented in [.env.example](.env.example). Do not commit a real `.env`.
+For an existing PostgreSQL volume, apply [the Stage 6 additive migration](scripts/migrate_stage6.sql) before using sessions; fresh volumes receive the tables from `scripts/schema.sql`. The exact command is in [memory policy](docs/memory-policy.md).
 
 ## API overview
 
@@ -194,6 +199,9 @@ Configuration is documented in [.env.example](.env.example). Do not commit a rea
 - `POST /ask`: answer from retrieved evidence with citations or abstain.
 - `POST /ask/planned`: analyze a goal, run a bounded read-only search plan, and return cited findings or a clarification. Body: `{"query":"...","top_k":3}`; response includes `state`, `answer`, `citations`, `goal`, `plan`, `trace`, `usage`, and `metadata`.
 - `POST /ask/tools`: use the validated read-only search and chunk-reading tools for the same bounded answer workflow. The body is `{"query":"...","top_k":3}`; caller-supplied scope is rejected.
+- `POST /sessions`: create an expiring session; returns its ID and a one-time bearer token.
+- `POST /sessions/{session_id}/ask`: answer a follow-up with `X-Session-Token` and `{"query":"...","top_k":3}`.
+- `GET /sessions/{session_id}`, `POST /sessions/{session_id}/reset`, and `DELETE /sessions/{session_id}`: inspect, clear, or delete that session with the same token.
 
 Use the OpenAPI page at `/docs` for request schemas and response examples. Available retrieval settings and filters are defined by the API request model.
 
@@ -255,6 +263,16 @@ The saved three-source and clarification runs are in `evals/results/stage5-*.jso
 These are local examples, not a Stage 5 quality gate; the three-source run
 missed one named document in its final citations.
 
+To run the Stage 6 two-turn check, use:
+
+```bash
+uv run python -m app.evaluation.session_runner \
+  --output evals/results/stage6-followup.json
+```
+
+It creates and deletes a temporary session and does not save its token. Use
+`POST /sessions` for an interactive session and keep the returned token private.
+
 ## Local MCP server
 
 A trusted local MCP client can launch the read-only server from the repository
@@ -280,7 +298,8 @@ delegated tenant access are not implemented yet.
 - [Evaluation methodology and split discipline](docs/evaluation-policy.md)
 - [Stage 4 planning policy and measured examples](docs/planning-policy.md)
 - [Stage 5 tool contracts, MCP boundary, and measured limitations](docs/tool-policy.md)
+- [Stage 6 session, retention, and evidence-memory policy](docs/memory-policy.md)
 
 ## Scope and limitations
 
-This is an in-progress learning and portfolio project. It is not certified or approved for real enterprise data. Before production use, complete and review authentication, tenant/document authorization, security controls, deployment hardening, load testing, data retention/deletion policy, and operational recovery. Stage 3's gates pass on the current small local dataset; they do not establish production readiness.
+This is an in-progress learning and portfolio project. It is not certified or approved for real enterprise data. Before production use, complete and review authentication, tenant/document authorization, security controls, deployment hardening, load testing, data retention/deletion policy, and operational recovery. Session tokens do not replace user authentication. Stage 3's gates pass on the current small local dataset; they do not establish production readiness.

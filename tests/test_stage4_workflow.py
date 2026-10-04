@@ -73,6 +73,19 @@ def test_named_document_comparison_keeps_current_versioned_policy():
     }
 
 
+def test_explicit_single_document_title_excludes_unrelated_sources():
+    candidates = [
+        _candidate("payment-incident-runbook.md", "on-call response", "i"),
+        _candidate("service-ownership.md", "Mercury owner", "o"),
+    ]
+    selected = _restrict_to_named_documents(
+        "According to the payment incident runbook, who responds?", candidates,
+    )
+    assert [item["document"] for item in selected] == [
+        "payment-incident-runbook.md",
+    ]
+
+
 def test_workflow_compares_two_documents_and_records_states():
     with (
         patch("app.agents.workflow.analyze_goal", return_value=(

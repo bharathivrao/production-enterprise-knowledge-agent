@@ -21,10 +21,12 @@ same `not_found` response. No write operations are registered.
 
 The Stage 4 planner still proposes bounded search queries. Stage 5 routes
 those steps through `search_documents`, then a structured model choice selects
-up to three returned chunk IDs for `read_document_chunks`. The server checks
-that every selected ID came from scoped search and that explicitly named
-documents are represented when available. Full text reaches synthesis only
-after the scoped read. Model output cannot invoke other tools or supply scope.
+up to three **numbered search candidates**. The server maps those numbers to
+chunk IDs for `read_document_chunks`; the model does not need to copy UUIDs.
+The server checks that every selection came from scoped search and that
+explicitly named documents are represented when available. Full text reaches
+synthesis only after the scoped read. Model output cannot invoke other tools
+or supply scope.
 
 Defaults for the tool-enabled path are five total steps (up to three searches,
 one read, synthesis), seven model calls, four tool calls, 12,000 accounted

@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stages 1–5 are implemented pending owner review. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, and read-only tools with a local stdio MCP adapter. It is not yet a complete agent or a production-ready enterprise service.
+Current status: Stages 1–6 are implemented pending owner review. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, read-only tools with a local stdio MCP adapter, and expiring capability-protected conversation sessions. It is not yet a complete agent or a production-ready enterprise service.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -86,6 +86,15 @@ Status is based on inspected repository code and recorded evaluation results. Em
   scope. It is not an authenticated network service.
 - See `docs/tool-policy.md` and `evals/results/stage5-*.json` for boundaries,
   measured examples, and the remaining citation-quality gap.
+
+### Working and conversation memory
+
+- Expiring PostgreSQL sessions and bounded turns support follow-ups, reset,
+  deletion, optimistic concurrency, and token-based session isolation.
+- Previous generated answers are retained for display but not used as evidence;
+  source titles are reauthorized and retrieval runs again under current scope.
+- See `docs/memory-policy.md` and `evals/results/stage6-followup.json` for the
+  contract, demonstration, and pre-authentication limitations.
 
 ## Recorded results and their limits
 
@@ -229,17 +238,24 @@ Stage 7 evidence checking. See `docs/tool-policy.md`.
 
 ### 6. Working and conversation memory
 
-Status: placeholder files only.
+Status: completed October 4, 2026; pending owner review.
 
-- [ ] Define working memory for plan progress, evidence, tool observations, and unresolved questions.
-- [ ] Add conversation sessions with user/tenant isolation.
-- [ ] Define persistence, retention, deletion, and expiry behavior; use PostgreSQL or Redis according to requirements.
-- [ ] Bound history size and summarize or select context when necessary.
-- [ ] Preserve source references and avoid treating previous generated answers as verified evidence.
-- [ ] Handle follow-up references and corrections without leaking another session's data.
-- [ ] Test concurrent sessions and memory reset/deletion.
+- [x] Define working memory for plan progress, evidence, tool observations, and unresolved questions.
+- [x] Add conversation sessions with capability and server-scope isolation (full user identity remains Stage 8).
+- [x] Define PostgreSQL persistence, retention, deletion, and expiry behavior.
+- [x] Bound stored history and select recent whole turns within a token budget.
+- [x] Preserve source references and avoid treating previous generated answers as verified evidence.
+- [x] Handle follow-up references and corrections without leaking another session's data.
+- [x] Test concurrent sessions, source reauthorization, and memory reset/deletion.
 
 Completion evidence: follow-up questions preserve context while evidence grounding and session isolation remain intact.
+
+Evidence: the local two-turn run passed five checks: incident-runbook citation,
+payment-platform reference resolution, ownership-guide citation, two persisted
+turns, and fresh follow-up tool search. The temporary session was deleted and
+its token was not saved. Unit/API and PostgreSQL integration tests cover
+wrong-token/tenant isolation, optimistic conflicts, reset, deletion, expiry,
+retention, and newly inaccessible source titles. See `docs/memory-policy.md`.
 
 ### 7. Evidence checking and self-correction
 
