@@ -2,7 +2,7 @@
 
 A production-oriented knowledge agent that ingests enterprise documents, finds permission-scoped evidence, and answers questions with citations. The project is being built in nine stages, from a transparent RAG pipeline to planning, tools, memory, self-correction, guardrails, and operational deployment.
 
-**Current status:** Stages 1–6 are implemented pending owner review. Stage 3's held-out evaluation gates pass on a small local corpus; Stages 4–6 add bounded planning, read-only tools, and opt-in conversation sessions. This is not a production-quality guarantee; Stages 7–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
+**Current status:** Stages 1–7 are implemented. Stage 3's held-out evaluation gates pass on a small local corpus; Stages 4–7 add bounded planning, read-only tools, opt-in sessions, and evidence checking. This is not a production-quality guarantee; Stages 8–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
 
 ## Original project stages
 
@@ -10,11 +10,11 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 |---|---|---|
 | 1 | Basic RAG: ingestion, vector storage, retrieval, cited answers | Implemented |
 | 2 | Production retrieval: hybrid search and reranking | Implemented; vector is the measured default |
-| 3 | Evaluation: datasets, metrics, quality gates | Implemented; all acceptance gates pass; pending owner review |
-| 4 | Goal analysis and planning | Implemented; pending owner review |
-| 5 | Tools and MCP | Implemented; pending owner review |
-| 6 | Working and conversation memory | Implemented; pending owner review |
-| 7 | Self-correction and evidence verification | Planned |
+| 3 | Evaluation: datasets, metrics, quality gates | Implemented; all acceptance gates pass |
+| 4 | Goal analysis and planning | Implemented |
+| 5 | Tools and MCP | Implemented |
+| 6 | Working and conversation memory | Implemented |
+| 7 | Self-correction and evidence verification | Implemented |
 | 8 | Guardrails and enterprise access controls | Planned |
 | 9 | Packaging, deployment, and operations | Planned |
 
@@ -68,9 +68,9 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 ### Stage 7 — Self-correction
 
-**Planned:** Check whether claims have supporting evidence, detect missing coverage or conflicting sources, then revise the plan or search a bounded number of times. Preserve citations through revisions and abstain when evidence remains weak.
+**Built:** Planned, tool-assisted, and session answers now pass through a structured support/contradiction/coverage checker after structural citation validation. An explicitly requested document must support its corresponding finding when its name resolves uniquely. One targeted, non-repeated correction search and revision are allowed. A second check keeps only supported findings; an unavailable checker fails closed. The single-pass `/ask` path remains unchanged. See [verification policy](docs/verification-policy.md).
 
-**Target demonstration:** A weak first retrieval triggers one useful additional search or a clear abstention, without an unbounded agent loop.
+**Measured demonstration:** The prior three-source tool run cited only two named documents. A Stage 7 local replay used one correction search and cited all three requested documents in the final answer. It took about 25.4 seconds and 11 model calls versus 13.7 seconds and 7 calls for the prior run. This is one case, not a broad accuracy claim; the checker can still make mistakes.
 
 ### Stage 8 — Guardrails
 
@@ -88,7 +88,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 Stages 1–8 describe the learning and feature milestones; Stage 9 covers production packaging and operations. Remaining production work includes:
 
-- Review and accept completed Stage 6; continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
+- Continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
 - Add CI for tests and evaluation gates; document migrations and rollback.
 - Finish the application container, deployment configuration, secrets handling, structured logs, request tracing, metrics, readiness probes, backups, and recovery procedures.
 - Test realistic load, failure recovery, and access-control boundaries.
@@ -119,11 +119,14 @@ Complex question → Typed goal → Validated search plan → Scoped search tool
                                                │
                                                ▼
                                   Selected scoped read → Cited synthesis
+                                                        │
+                                                        ▼
+                                          Evidence check → Return or one correction
 
 Session token + recent user turns → Follow-up resolver → Fresh scoped workflow
 ```
 
-Stage 4 adds the opt-in planning path; Stage 5 adds the tool-enabled path; Stage 6 adds bounded sessions. Stage 7 adds evidence checks. Stage 8 applies identity, access, and safety controls across the workflow.
+Stage 4 adds the opt-in planning path; Stage 5 adds the tool-enabled path; Stage 6 adds bounded sessions; Stage 7 adds one-pass evidence checking and correction. Stage 8 applies identity, access, and safety controls across the workflow.
 
 ## Technology
 
@@ -185,8 +188,8 @@ Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama
    RUN_POSTGRES_INTEGRATION=1 uv run pytest -q tests/integration
    ```
 
-   On the current Stage 6 change set, the default suite passed 115 tests with
-   3 opt-in skips; all 6 PostgreSQL integration tests passed separately.
+   The Stage 7 default suite passed 123 tests with 3 opt-in skips; all six
+   PostgreSQL integration tests passed separately. See [verification policy](docs/verification-policy.md).
 
 Configuration is documented in [.env.example](.env.example). Do not commit a real `.env`.
 For an existing PostgreSQL volume, apply [the Stage 6 additive migration](scripts/migrate_stage6.sql) before using sessions; fresh volumes receive the tables from `scripts/schema.sql`. The exact command is in [memory policy](docs/memory-policy.md).
@@ -261,7 +264,10 @@ uv run python -m app.agents.workflow \
 
 The saved three-source and clarification runs are in `evals/results/stage5-*.json`.
 These are local examples, not a Stage 5 quality gate; the three-source run
-missed one named document in its final citations.
+missed one named document in its final citations. The Stage 7 replay is saved
+as `evals/results/stage7-three-source-comparison.json`.
+The Stage 7 session replay is saved as `evals/results/stage7-session-followup.json`;
+all five scenario checks passed and its temporary session was deleted.
 
 To run the Stage 6 two-turn check, use:
 
@@ -299,6 +305,7 @@ delegated tenant access are not implemented yet.
 - [Stage 4 planning policy and measured examples](docs/planning-policy.md)
 - [Stage 5 tool contracts, MCP boundary, and measured limitations](docs/tool-policy.md)
 - [Stage 6 session, retention, and evidence-memory policy](docs/memory-policy.md)
+- [Stage 7 evidence checking, correction, and measured tradeoff](docs/verification-policy.md)
 
 ## Scope and limitations
 

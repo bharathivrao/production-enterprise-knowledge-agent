@@ -9,6 +9,11 @@ from typing import Literal
 import tiktoken
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.agents.critic import (
+    CRITIC_PROMPT_VERSION, CRITIC_SYSTEM_PROMPT, EvidenceReview, FindingReview,
+    check_evidence,
+    novel_search_query, safe_findings,
+)
 from app.agents.goal_analyzer import GOAL_PROMPT_VERSION, Goal, analyze_goal
 from app.agents.planner import PLAN_PROMPT_VERSION, Plan, SearchStep, plan_goal
 from app.agents.synthesizer import (
@@ -28,7 +33,8 @@ ABSTENTION = "The available documents do not contain enough information."
 State = Literal[
     "received", "analyzing", "planning", "searching", "searched",
     "evidence_selected", "selecting_tool", "reading", "read", "tool_failed",
-    "synthesizing", "completed", "clarification", "failed",
+    "synthesizing", "checking", "correction_searching", "correction_searched",
+    "revising", "check_failed", "completed", "clarification", "failed",
 ]
 
 
@@ -68,6 +74,8 @@ class WorkflowMetadata(BaseModel):
     max_runtime_seconds: int
     tool_selection_prompt_version: str | None = None
     max_tool_calls: int | None = None
+    critic_prompt_version: str | None = None
+    max_corrections: int = 1
 
 
 class WorkflowResult(BaseModel):
@@ -192,6 +200,42 @@ def _restrict_to_named_documents(question: str, candidates: list[dict]) -> list[
             if selected_names else candidates)
 
 
+def _enforce_named_source_coverage(
+    question: str, plan: Plan, candidates: list[dict], draft,
+    sources: dict, review: EvidenceReview,
+) -> tuple[EvidenceReview, list[str]]:
+    """Do not let a semantic reviewer waive explicit per-step source requests."""
+    named_in_question = _named_documents(question, candidates)
+    if not named_in_question:
+        return review, []
+    findings = list(review.findings)
+    feedback = []
+    search_query = review.search_query
+    for step in plan.steps:
+        if not isinstance(step, SearchStep):
+            continue
+        names = _named_documents(step.query, candidates) & named_in_question
+        if len(names) != 1:
+            continue
+        required = next(iter(names))
+        finding = draft.findings[step.deliverable_index]
+        cited = {sources[source_id]["document"] for source_id in finding.source_ids}
+        if required not in cited and finding.source_ids:
+            findings[step.deliverable_index] = FindingReview(
+                deliverable_index=step.deliverable_index, verdict="incomplete",
+                reason="Explicitly requested source is not cited",
+            )
+            feedback.append(
+                f"Deliverable {step.deliverable_index}: use {required} only if it "
+                "directly supports the finding; otherwise mark evidence missing."
+            )
+            if not search_query:
+                search_query = f"{required} {plan.goal.deliverables[step.deliverable_index]}"[:300]
+    return review.model_copy(update={
+        "findings": findings, "search_query": search_query,
+    }), feedback
+
+
 def run_planned_answer(
     question: str, *, top_k: int = 3, scope: RetrievalScope = PUBLIC_SCOPE,
 ) -> WorkflowResult:
@@ -237,6 +281,7 @@ def _run_answer(
             TOOL_SELECTION_PROMPT_VERSION if use_tools else None
         ),
         max_tool_calls=settings.tool_workflow_max_tool_calls if use_tools else None,
+        critic_prompt_version=CRITIC_PROMPT_VERSION,
     )
 
     def transition(state: State, *, step_id=None, result_count=None,
@@ -339,6 +384,7 @@ def _run_answer(
         transition("synthesizing", step_id=plan.steps[-1].step_id)
         if candidates:
             evidence = build_context(candidates)
+            original_sources = evidence["sources"]
             estimated_prompt = _estimate_tokens(
                 SYNTHESIS_SYSTEM_PROMPT + question + analysis.goal.model_dump_json()
                 + evidence["context"]
@@ -358,6 +404,107 @@ def _run_answer(
             answer, citations = render_synthesis(
                 analysis.goal, draft, evidence["sources"],
             )
+            transition("checking")
+            try:
+                budget.require_tokens(_estimate_tokens(
+                    CRITIC_SYSTEM_PROMPT + question + draft.model_dump_json()
+                    + evidence["context"]
+                ) + 128)
+                budget.call()
+                review, usage = check_evidence(
+                    question, analysis.goal, draft, evidence["context"],
+                )
+                budget.add_tokens(usage["prompt_tokens"] + usage["completion_tokens"])
+                review, revision_feedback = _enforce_named_source_coverage(
+                    question, plan, candidates, draft, evidence["sources"], review,
+                )
+            except Exception as error:
+                # A failed checker must never release an unchecked draft.
+                transition("check_failed", tool_status=type(error).__name__)
+                answer, citations = ABSTENTION, []
+            else:
+                if any(item.verdict != "supported" for item in review.findings):
+                    # One correction cycle; a repeated or invalid query cannot loop.
+                    prior_queries = {
+                        " ".join(step.query.casefold().split())
+                        for step in plan.steps if isinstance(step, SearchStep)
+                    }
+                    query = novel_search_query(review, prior_queries)
+                    try:
+                        if query:
+                            transition("correction_searching", step_id="correction_1",
+                                       tool_name="search_documents" if dispatcher else None,
+                                       argument_summary={"query_chars": len(query), "top_k": top_k})
+                            budget.require_tokens(_estimate_tokens(query))
+                            budget.call()
+                            if dispatcher:
+                                observation = dispatcher.execute(
+                                    "search_documents", {"query": query, "top_k": top_k},
+                                )
+                                added = observation.result
+                                if added:
+                                    # IDs come from the scoped search; the read validates scope again.
+                                    ids = [item["chunk_id"] for item in added[:3]]
+                                    added = dispatcher.execute(
+                                        "read_document_chunks", {"chunk_ids": ids},
+                                    ).result
+                            else:
+                                added = search_chunks(query, top_k=top_k, scope=fixed_scope)
+                            budget.add_tokens(_estimate_tokens(query))
+                            candidates = _restrict_to_named_documents(
+                                question, deduplicate_candidates([*candidates, *added]),
+                            )
+                            transition("correction_searched", step_id="correction_1",
+                                       result_count=len(added),
+                                       tool_name="search_documents" if dispatcher else None,
+                                       tool_status="ok" if dispatcher else None)
+                        transition("revising", step_id="correction_1")
+                        evidence = build_context(candidates)
+                        estimated_prompt = _estimate_tokens(
+                            SYNTHESIS_SYSTEM_PROMPT + question
+                            + analysis.goal.model_dump_json() + evidence["context"]
+                        )
+                        budget.require_tokens(estimated_prompt + 128)
+                        max_output_tokens = min(
+                            768, settings.workflow_max_tokens - budget.tokens - estimated_prompt,
+                        )
+                        budget.call()
+                        revised, usage = synthesize_findings(
+                            question, analysis.goal, evidence["context"],
+                            max_output_tokens=max_output_tokens,
+                            feedback=revision_feedback or [
+                                f"Recheck deliverable {item.deliverable_index}: {item.verdict}."
+                                for item in review.findings if item.verdict != "supported"
+                            ],
+                        )
+                        budget.add_tokens(usage["prompt_tokens"] + usage["completion_tokens"])
+                        # Structural validation precedes every semantic check.
+                        render_synthesis(analysis.goal, revised, evidence["sources"])
+                        transition("checking", step_id="correction_1")
+                        budget.require_tokens(_estimate_tokens(
+                            CRITIC_SYSTEM_PROMPT + question + revised.model_dump_json()
+                            + evidence["context"]
+                        ) + 128)
+                        budget.call()
+                        final_review, usage = check_evidence(
+                            question, analysis.goal, revised, evidence["context"],
+                        )
+                        budget.add_tokens(usage["prompt_tokens"] + usage["completion_tokens"])
+                        final_review, _ = _enforce_named_source_coverage(
+                            question, plan, candidates, revised, evidence["sources"],
+                            final_review,
+                        )
+                        answer, citations = render_synthesis(
+                            analysis.goal, safe_findings(revised, final_review),
+                            evidence["sources"],
+                        )
+                    except Exception as error:
+                        transition("check_failed", step_id="correction_1",
+                                   tool_status=type(error).__name__)
+                        answer, citations = render_synthesis(
+                            analysis.goal, safe_findings(draft, review),
+                            original_sources,
+                        )
         else:
             answer, citations = ABSTENTION, []
 

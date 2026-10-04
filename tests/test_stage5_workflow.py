@@ -4,6 +4,7 @@ from uuid import uuid4
 import pytest
 
 from app.agents.goal_analyzer import Goal, GoalAnalysis
+from app.agents.critic import EvidenceReview, FindingReview
 from app.agents.planner import Plan, SearchStep, SynthesizeStep
 from app.agents.synthesizer import Finding, SynthesisDraft
 from app.agents.tool_selector import SelectedTool
@@ -61,18 +62,24 @@ def test_tool_workflow_selects_scoped_read_and_cites_both_documents():
                 Finding(deliverable_index=1, text="Mercury owns it.", source_ids=["S2"]),
             ]), USAGE,
         )),
+        patch("app.agents.workflow.check_evidence", return_value=(
+            EvidenceReview(findings=[
+                FindingReview(deliverable_index=0, verdict="supported", reason="cited evidence"),
+                FindingReview(deliverable_index=1, verdict="supported", reason="cited evidence"),
+            ]), USAGE,
+        )),
     ):
         result = run_tool_answer("Compare incident.md and ownership.md")
     assert result.state == "completed"
     assert {citation.document for citation in result.citations} == {
         "incident.md", "ownership.md",
     }
-    assert result.usage.model_calls == 6
+    assert result.usage.model_calls == 7
     assert [call.args[0] for call in dispatcher.execute.call_args_list] == [
         "search_documents", "search_documents", "read_document_chunks",
     ]
     assert boundary.call_args.args[0].as_of is not None
-    assert boundary.call_args.kwargs["max_calls"] == 4
+    assert boundary.call_args.kwargs["max_calls"] == 6
     assert any(event.state == "read" and event.result_count == 2 for event in result.trace)
     assert all("query" not in event.model_dump(exclude_none=True)
                for event in result.trace)

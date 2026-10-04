@@ -35,8 +35,8 @@ HTTP error with the completed transitions. Expected states include `received`,
 
 ## Limits
 
-Defaults in `.env.example` are four total steps (up to three searches plus
-synthesis), six model calls (goal, plan, three embeddings, synthesis), 12,000
+Defaults in `.env.example` are four initial-plan steps (up to three searches plus
+synthesis), ten model calls including Stage 7 checking and one correction, 12,000
 accounted tokens, and 600 seconds. Analyzer/planner/synthesis output tokens
 also have per-call caps. The workflow checks token and elapsed-time budgets
 after each call and before starting another. The shared Ollama client has a
@@ -69,13 +69,13 @@ a general quality benchmark.
 
 ## Current boundaries
 
-- Search is the only executable step. Typed tool dispatch, document-reading
-  tools, and MCP are Stage 5 work.
-- The workflow does not store a conversation or plan progress across requests;
-  memory is Stage 6 work.
-- Citation validation confirms source IDs and locations, not that every claim
-  is semantically entailed. Bounded evidence checking and correction are Stage
-  7 work.
+- Search is the only executable step on this endpoint. Stage 5's typed
+  search/read dispatcher and MCP are available through the tool path.
+- This endpoint does not store a conversation across requests; Stage 6
+  sessions provide a separate persistent follow-up path.
+- Citation validation confirms source IDs and locations. Stage 7 now adds
+  fallible semantic checking and one bounded correction; see
+  `docs/verification-policy.md`.
 - The API currently uses the public server scope. User authentication and
   broader enterprise access policy are Stage 8 work.
 - Filename matching is a conservative title heuristic and can miss aliases.

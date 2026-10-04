@@ -9,11 +9,11 @@ retrieves permission-scoped evidence, answers with citations, and eventually
 supports bounded tools, memory, verification, access controls, and deployment.
 The nine stages are in `PROJECT_ROADMAP.md`. The owner wants **one stage at a
 time**, followed by an explanation of what it does and why and a request for
-review. Do not begin the next stage before review. Stages 1–5 were pushed to
-`origin/main` (Stage 5: `cb0ac3a`). Stage 6 is implemented and the owner has
-requested its push to `origin/main`; confirm the commit and remote branch with
-`git status -sb` and `git log -1 --oneline` in a fresh session. The owner has
-not requested Stage 7 work. This is not safe for real enterprise data.
+review. Do not begin the next stage before review. Stages 1–6 were pushed to
+`origin/main` (Stage 6: `7089f31`). The owner approved Stage 7 for push to
+`origin/main`; confirm the commit and remote branch with `git status -sb` and
+`git log -1 --oneline` in a fresh session. The owner has not requested Stage 8
+work. This is not safe for real enterprise data.
 
 ## Current architecture
 
@@ -50,6 +50,10 @@ not requested Stage 7 work. This is not safe for real enterprise data.
   progress, tool observations, citations, and unresolved questions. A
   structured resolver uses recent user questions and reauthorized source
   titles, never old generated answers, then invokes Stage 5 retrieval anew.
+- Stage 7 (`app/agents/critic.py`, `app/agents/workflow.py`) checks drafted
+  findings against freshly retrieved evidence, enforces resolvable named
+  document citation requirements, and permits one scoped correction/recheck.
+  The legacy single-pass `/ask` path remains unchanged.
 
 ## Important design decisions
 
@@ -66,12 +70,13 @@ not requested Stage 7 work. This is not safe for real enterprise data.
   unresolved aliases retain normally scoped candidates.
 - Synthesis yields one finding per deliverable. Factual findings require known
   source IDs; an uncited finding must use the exact insufficient-evidence text.
-  Server citation checks are structural, not semantic entailment verification.
-- Defaults: four steps (three searches plus synthesis), six model calls,
+  Stage 7 adds fallible semantic checking and deterministic named-document
+  coverage; no model review can prove claim support.
+- Defaults: four initial-plan steps (three searches plus synthesis), ten model calls,
   12,000 accounted tokens, 600 seconds, plus per-call output caps. Ollama chat
   tokens are reported; embedding query tokens are estimated. Runtime checks
   are cooperative: in-flight calls cannot be cancelled at the exact deadline.
-- Stage 5 tool mode separately permits five steps, seven model calls, four
+- Stage 5 tool mode separately permits five initial-plan steps, eleven model calls, six
   tool calls, and one read of up to three chunks. `ToolDispatcher` rejects
   unknown names, extra/invalid arguments, exhausted budgets and missing or
   unauthorized chunk IDs. Its read SQL reuses `document_filter_sql`, so tenant,
@@ -90,12 +95,16 @@ not requested Stage 7 work. This is not safe for real enterprise data.
   Each follow-up runs fresh scoped tools before answering. Optimistic version
   checks return 409 on concurrent stale writes or reset races; no DB lock is
   held during model calls. Expired rows purge on session creation or via CLI.
-- Combined session limits are eight model calls, 14,000 accounted tokens, and
+- Combined session limits are twelve model calls, 14,000 accounted tokens, and
   750 seconds, cooperatively checked. Stage 6's session token is not a Stage 8
   authentication system, and no rate limiting is implemented.
 - Stage 2 vector default is measurement-based. Stage 3 held-out cases are
   acceptance-only; tune on development data. Local-model API charge is $0,
   but hardware/energy costs are unmeasured.
+- Stage 7 permits at most one novel correction search and one revision.
+  Structural validation and semantic rechecking apply after revision;
+  exhausted attempts mask unsupported findings or abstain. Checker failure
+  cannot release an unchecked draft. Model/tool budgets include the retry.
 
 ## Completed functionality and files changed
 
@@ -106,6 +115,7 @@ Stage 3 covers evaluation; implementation commit `91df72d` and README follow-up
 `9232dd3` were pushed previously.
 Stage 4 implementation was pushed as `3357599`.
 Stage 5 read-only tools/MCP were pushed as `cb0ac3a`.
+Stage 6 memory was pushed as `7089f31`.
 
 Stage 4 change set:
 
@@ -168,15 +178,43 @@ Stage 6 change set:
 - New `docs/memory-policy.md`; updated `README.md`, `PROJECT_ROADMAP.md`,
   `docs/tool-policy.md`, and this handoff.
 
+Stage 7 change set:
+
+- New `app/agents/critic.py`: typed, reference-free finding reviews,
+  per-deliverable verdicts, safe masking, and novel-query validation.
+- `app/agents/workflow.py`: structural then semantic checks, explicit-document
+  source alignment, one bounded scoped correction search/revision/recheck,
+  fail-closed partial answers/abstention, redacted trace and version metadata.
+- `app/agents/synthesizer.py`: versioned revision feedback sent as structured
+  data. `app/core/config.py` and `.env.example`: expanded model/tool-call
+  ceilings for one correction while preserving token/time limits.
+- New `tests/test_stage7_critic.py` and `tests/test_stage7_workflow.py`, plus
+  Stage 4/5 regression expectation updates. No schema change.
+- New `docs/verification-policy.md` and
+  `evals/results/stage7-three-source-comparison.json` and
+  `evals/results/stage7-session-followup.json`; updated README,
+  roadmap, and this handoff.
+
 ## Current state and tests
 
-Branch `main` tracks `origin/main`. The full
-default suite passed: **115 passed, 3 skipped** (`.venv/bin/pytest -q`). All
+Branch `main` tracks `origin/main`; the owner requested a Stage 7 push. The full
+default suite passed: **123 passed, 3 skipped** (`.venv/bin/pytest -q`). All
 six opt-in PostgreSQL integration tests passed separately with
 `RUN_POSTGRES_INTEGRATION=1`. New database tests cover session isolation,
 concurrent turns, reset/deletion, pruning/expiry, and current-scope
-reauthorization of remembered source titles. The Stage 6 push was requested by
-the owner; verify the final repository state before further work.
+reauthorization of remembered source titles. Stage 7's eight new tests cover
+critic contracts, novel query suppression, correction, source alignment, and
+fail-closed behavior. `git diff --check` passes.
+
+The live Stage 7 three-source replay searched once more, revised, and cited
+all three requested documents with no failed check. It used 11 model calls,
+3,985 accounted tokens, and about 25.4 seconds, versus Stage 5's 7 calls,
+2,147 tokens, and 13.7 seconds with only two source citations. This is one
+local comparison, not a measured population-level gain. An intermediate run
+with an invalid second critic output safely returned a partial answer; the
+saved final report is the successful replay.
+The Stage 7 two-turn session replay passed all five checks, including fresh
+follow-up search and session cleanup; its report contains no bearer token.
 
 The real `stage6-followup.json` scenario passed all five checks: turn one
 cited the payment incident runbook; “Who owns that service?” resolved to the
@@ -234,6 +272,15 @@ Reproduce Stage 6 against the populated sample corpus:
 .venv/bin/python -m app.memory.conversation_memory --purge-expired
 ```
 
+Reproduce Stage 7 (this overwrites the saved report, so use a different
+output path if preserving the accepted local example):
+
+```bash
+.venv/bin/python -m app.agents.workflow \
+  "Compare the payment incident runbook, service ownership guide, and current payment retry policy: who responds to a severity-one payment incident, who owns the payments platform, and what retry count and delay apply to payment submissions?" \
+  --tools --output /private/tmp/stage7-replay.json
+```
+
 Alternatively `POST /sessions`, save the returned one-time token privately,
 then send it as `X-Session-Token` to `POST /sessions/{id}/ask` with
 `{"query":"Who owns that service?","top_k":3}`. History, reset, and delete
@@ -247,27 +294,25 @@ saved reports when changing prompts.
 
 - Runtime budget is cooperative, not hard cancellation. Embedding token
   accounting is estimated; local compute cost is unmeasured.
-- Citation IDs and locations are checked, not semantic claim support. The
-  three-source Stage 5 run missed one named source in its final citations.
-  Title matching is heuristic and may miss aliases. Saved demonstrations are
-  not a broad agent-quality benchmark.
+- Stage 7's semantic reviewer is a fallible local model, not a guarantee of
+  entailment. An intermediate local run returned a qualified partial answer
+  after an invalid second review. Named-document matching is heuristic and
+  can miss aliases. One successful correction is not a broad benchmark.
 - MCP is local stdio/public-scope only; no remote authentication. Tool time
   limit checks are cooperative and do not forcibly cancel an in-flight call.
 - Session bearer tokens protect a single session but do not establish a user
   identity. Anyone holding a token can read/delete that session; there is no
   rate limiting. Expired rows are purged on create or manually; scheduled
   cleanup belongs to Stage 9. Do not use real enterprise data.
-- No Stage 7 evidence critic/retry; no Stage 8 authentication/enterprise access
-  policies; no Stage 9 complete packaging/deployment/CI. `PUBLIC_SCOPE` is
+- No Stage 8 authentication/enterprise access policies or Stage 9 complete
+  packaging/deployment/CI. `PUBLIC_SCOPE` is
   server-owned but is not user authentication. Do not use real enterprise data.
 - Stage 3's 50-case dataset is small and automated grading still needs human
   sampling; preserve split discipline when expanding it.
 
 ## Exact recommended next task
 
-Present Stage 6 for owner review: explain capability sessions and their
-pre-authentication limits, TTL/pruning/reset/delete, optimistic concurrency,
-bounded resolver input, current-scope source reauthorization, fresh retrieval,
-and the five-check local scenario. The next roadmap task is Stage 7: semantic
-evidence checking, bounded correction/re-search, and safe abstention when
-support is missing. Do not start Stage 7 without explicit owner direction.
+Stage 7 has been approved for push. Verify the branch is synchronized, then
+wait for explicit owner direction before Stage 8. The next roadmap task is
+Stage 8: authentication, per-user/tenant authorization, prompt-injection and
+sensitive-data safeguards, and rate limits.

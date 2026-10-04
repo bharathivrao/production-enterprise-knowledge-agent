@@ -28,8 +28,8 @@ explicitly named documents are represented when available. Full text reaches
 synthesis only after the scoped read. Model output cannot invoke other tools
 or supply scope.
 
-Defaults for the tool-enabled path are five total steps (up to three searches,
-one read, synthesis), seven model calls, four tool calls, 12,000 accounted
+Defaults for the tool-enabled path are five initial-plan steps (up to three searches,
+one read, synthesis), eleven model calls, six tool calls, 12,000 accounted
 tokens, a 600-second workflow runtime, and a 120-second cooperative per-tool
 limit. The shared Ollama client and PostgreSQL also have dependency timeouts.
 In-flight calls cannot be forcibly cancelled exactly at the tool or workflow
@@ -72,5 +72,6 @@ choices, and controlled failures. A real stdio MCP client test checks tool
 registration and argument rejection. The opt-in PostgreSQL test checks that
 the read tool rejects private, other-tenant, and superseded chunks. These
 tests do not make the unauthenticated public scope suitable for real enterprise
-data. Stage 6 memory, Stage 7 evidence checking, and Stage 8 identity and
-authorization remain separate work.
+data. Stage 6 memory and Stage 7 evidence checking are now implemented; Stage 8
+identity and authorization remain separate work. The extra Stage 7 calls permit
+one scoped correction search/read and recheck; see `docs/verification-policy.md`.

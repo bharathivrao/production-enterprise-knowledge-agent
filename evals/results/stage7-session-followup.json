@@ -1,0 +1,286 @@
+{
+  "scenario": "payment-platform-ownership-followup",
+  "passed": true,
+  "checks": {
+    "first_turn_grounded_in_incident_runbook": true,
+    "followup_resolves_payments_platform": true,
+    "followup_grounded_in_ownership_guide": true,
+    "two_turns_persisted": true,
+    "followup_uses_fresh_tool_search": true
+  },
+  "first_turn": {
+    "session_id": "4b812505-50e8-4f25-b2f1-1a003dfb13f8",
+    "turn_id": "9897b606-eb75-45da-8c44-ad697d2a6263",
+    "state": "completed",
+    "original_question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+    "resolved_question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+    "answer": "- Name of the responsible party for severity-one incidents in the payments platform: The primary on-call responder [S1]",
+    "citations": [
+      {
+        "source_id": "S1",
+        "document": "payment-incident-runbook.md",
+        "section": "Severity-one payment incident"
+      }
+    ],
+    "memory": {
+      "question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+      "resolved_question": "For a severity-one incident on the payments platform, who responds according to the payment incident runbook?",
+      "goal_objective": "Determine the responsible party for a severity-one incident on the payments platform based on the payment incident runbook",
+      "plan_step_ids": [
+        "search_1",
+        "synthesis"
+      ],
+      "tool_observations": [
+        {
+          "tool_name": "search_documents",
+          "status": "ok",
+          "result_count": 3
+        },
+        {
+          "tool_name": "read_document_chunks",
+          "status": "ok",
+          "result_count": 1
+        }
+      ],
+      "cited_sources": [
+        {
+          "source_id": "S1",
+          "document": "payment-incident-runbook.md",
+          "section": "Severity-one payment incident"
+        }
+      ],
+      "unresolved_questions": []
+    },
+    "trace": [
+      {
+        "state": "received",
+        "elapsed_ms": 0.015583005733788013
+      },
+      {
+        "state": "analyzing",
+        "elapsed_ms": 0.023458036594092846
+      },
+      {
+        "state": "planning",
+        "elapsed_ms": 3945.2075000153854
+      },
+      {
+        "state": "searching",
+        "elapsed_ms": 5157.923583057709,
+        "step_id": "search_1",
+        "tool_name": "search_documents",
+        "argument_summary": {
+          "query_chars": 124,
+          "top_k": 3
+        }
+      },
+      {
+        "state": "searched",
+        "elapsed_ms": 6437.571124988608,
+        "step_id": "search_1",
+        "result_count": 3,
+        "tool_name": "search_documents",
+        "tool_status": "ok"
+      },
+      {
+        "state": "evidence_selected",
+        "elapsed_ms": 6438.337916042656,
+        "result_count": 1
+      },
+      {
+        "state": "selecting_tool",
+        "elapsed_ms": 6438.388791051693
+      },
+      {
+        "state": "reading",
+        "elapsed_ms": 7604.777749977075,
+        "step_id": "read_1",
+        "tool_name": "read_document_chunks",
+        "argument_summary": {
+          "chunk_count": 1
+        }
+      },
+      {
+        "state": "read",
+        "elapsed_ms": 7618.245749967173,
+        "step_id": "read_1",
+        "result_count": 1,
+        "tool_name": "read_document_chunks",
+        "tool_status": "ok"
+      },
+      {
+        "state": "synthesizing",
+        "elapsed_ms": 7618.278541020118,
+        "step_id": "synthesis"
+      },
+      {
+        "state": "checking",
+        "elapsed_ms": 9172.785583068617
+      },
+      {
+        "state": "completed",
+        "elapsed_ms": 11643.03783304058
+      }
+    ],
+    "usage": {
+      "model_calls": 6,
+      "tokens": 1486,
+      "elapsed_ms": 11723.533708020113
+    },
+    "workflow_metadata": {
+      "goal_prompt_version": "4.0.0",
+      "plan_prompt_version": "4.0.0",
+      "synthesis_prompt_version": "7.0.0",
+      "generation_model": "qwen3:4b",
+      "embedding_model": "embeddinggemma",
+      "retrieval_method": "vector",
+      "max_steps": 5,
+      "max_model_calls": 11,
+      "max_tokens": 12000,
+      "max_runtime_seconds": 600,
+      "tool_selection_prompt_version": "5.1.0",
+      "max_tool_calls": 6,
+      "critic_prompt_version": "7.0.0",
+      "max_corrections": 1
+    },
+    "followup_prompt_version": "6.2.0"
+  },
+  "followup_turn": {
+    "session_id": "4b812505-50e8-4f25-b2f1-1a003dfb13f8",
+    "turn_id": "f28b545b-c262-420e-bf79-1b99cabe7adc",
+    "state": "completed",
+    "original_question": "Who owns that service?",
+    "resolved_question": "According to the available documents, Who owns the payments platform service?",
+    "answer": "- Name of the entity that owns the payments platform service: Mercury team [S1]",
+    "citations": [
+      {
+        "source_id": "S1",
+        "document": "service-ownership.md",
+        "section": "Payments platform"
+      }
+    ],
+    "memory": {
+      "question": "Who owns that service?",
+      "resolved_question": "According to the available documents, Who owns the payments platform service?",
+      "goal_objective": "Identify the owner of the payments platform service",
+      "plan_step_ids": [
+        "search_1",
+        "synthesis"
+      ],
+      "tool_observations": [
+        {
+          "tool_name": "search_documents",
+          "status": "ok",
+          "result_count": 3
+        },
+        {
+          "tool_name": "read_document_chunks",
+          "status": "ok",
+          "result_count": 1
+        }
+      ],
+      "cited_sources": [
+        {
+          "source_id": "S1",
+          "document": "service-ownership.md",
+          "section": "Payments platform"
+        }
+      ],
+      "unresolved_questions": []
+    },
+    "trace": [
+      {
+        "state": "received",
+        "elapsed_ms": 0.04600000102072954
+      },
+      {
+        "state": "analyzing",
+        "elapsed_ms": 0.05816703196614981
+      },
+      {
+        "state": "planning",
+        "elapsed_ms": 2127.562833018601
+      },
+      {
+        "state": "searching",
+        "elapsed_ms": 3001.9605420529842,
+        "step_id": "search_1",
+        "tool_name": "search_documents",
+        "argument_summary": {
+          "query_chars": 71,
+          "top_k": 3
+        }
+      },
+      {
+        "state": "searched",
+        "elapsed_ms": 3138.0649169441313,
+        "step_id": "search_1",
+        "result_count": 3,
+        "tool_name": "search_documents",
+        "tool_status": "ok"
+      },
+      {
+        "state": "evidence_selected",
+        "elapsed_ms": 3138.276792014949,
+        "result_count": 3
+      },
+      {
+        "state": "selecting_tool",
+        "elapsed_ms": 3138.285667053424
+      },
+      {
+        "state": "reading",
+        "elapsed_ms": 4229.142416967079,
+        "step_id": "read_1",
+        "tool_name": "read_document_chunks",
+        "argument_summary": {
+          "chunk_count": 1
+        }
+      },
+      {
+        "state": "read",
+        "elapsed_ms": 4237.299875007011,
+        "step_id": "read_1",
+        "result_count": 1,
+        "tool_name": "read_document_chunks",
+        "tool_status": "ok"
+      },
+      {
+        "state": "synthesizing",
+        "elapsed_ms": 4237.335707992315,
+        "step_id": "synthesis"
+      },
+      {
+        "state": "checking",
+        "elapsed_ms": 5499.9567499617115
+      },
+      {
+        "state": "completed",
+        "elapsed_ms": 7372.681707958691
+      }
+    ],
+    "usage": {
+      "model_calls": 7,
+      "tokens": 1728,
+      "elapsed_ms": 8756.468249950558
+    },
+    "workflow_metadata": {
+      "goal_prompt_version": "4.0.0",
+      "plan_prompt_version": "4.0.0",
+      "synthesis_prompt_version": "7.0.0",
+      "generation_model": "qwen3:4b",
+      "embedding_model": "embeddinggemma",
+      "retrieval_method": "vector",
+      "max_steps": 5,
+      "max_model_calls": 11,
+      "max_tokens": 12000,
+      "max_runtime_seconds": 600,
+      "tool_selection_prompt_version": "5.1.0",
+      "max_tool_calls": 6,
+      "critic_prompt_version": "7.0.0",
+      "max_corrections": 1
+    },
+    "followup_prompt_version": "6.2.0"
+  },
+  "session_deleted_after_run": true
+}

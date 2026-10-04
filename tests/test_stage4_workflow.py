@@ -4,6 +4,7 @@ from time import perf_counter
 import pytest
 
 from app.agents.goal_analyzer import Goal, GoalAnalysis
+from app.agents.critic import EvidenceReview, FindingReview
 from app.agents.planner import Plan, SearchStep, SynthesizeStep
 from app.agents.synthesizer import Finding, SynthesisDraft
 from app.agents.workflow import (
@@ -109,6 +110,12 @@ def test_workflow_compares_two_documents_and_records_states():
             ]),
             {"prompt_tokens": 100, "completion_tokens": 30},
         )),
+        patch("app.agents.workflow.check_evidence", return_value=(
+            EvidenceReview(findings=[
+                FindingReview(deliverable_index=0, verdict="supported", reason="cited evidence"),
+                FindingReview(deliverable_index=1, verdict="supported", reason="cited evidence"),
+            ]), USAGE,
+        )),
     ):
         result = run_planned_answer(QUESTION)
 
@@ -116,9 +123,10 @@ def test_workflow_compares_two_documents_and_records_states():
     assert {citation.document for citation in result.citations} == {"incident.md", "owners.md"}
     assert [event.state for event in result.trace] == [
         "received", "analyzing", "planning", "searching", "searched",
-        "searching", "searched", "evidence_selected", "synthesizing", "completed",
+        "searching", "searched", "evidence_selected", "synthesizing",
+        "checking", "completed",
     ]
-    assert result.usage.model_calls == 5
+    assert result.usage.model_calls == 6
     assert search.call_args_list[0].kwargs["scope"].as_of == search.call_args_list[1].kwargs["scope"].as_of
 
 

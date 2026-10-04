@@ -64,7 +64,7 @@ A resolved follow-up is asked again through the current Stage 5 search/read
 workflow. Previous citations are pointers for context, never substitute for
 fresh source text. The first turn needs no resolver call; later turns use one
 bounded structured resolver call. A vague reference may yield a clarification
-without retrieval. Combined defaults are eight model calls, 14,000 accounted
+without retrieval. Combined defaults are twelve model calls, 14,000 accounted
 tokens, and 750 seconds across resolver and tool workflow. Limits are
 cooperative; in-flight dependency calls are not forcibly cancelled.
 
@@ -85,6 +85,6 @@ turn two, two persisted turns, and a fresh tool search for the follow-up.
 This is a small local behavior check, not a general conversational-quality
 gate. Unit and PostgreSQL integration tests cover token/scope isolation,
 concurrent writes, reset/deletion, retention, expiry, source-title
-reauthorization, and controlled errors. Stage 7 still needs semantic evidence
+reauthorization, and controlled errors. Stage 7 now adds semantic evidence
 checking and correction; Stage 8 needs real identity, authorization, and
 sensitive-data policy; Stage 9 needs scheduled cleanup and operations.

@@ -1,0 +1,235 @@
+{
+  "state": "completed",
+  "answer": "- Who responds to a severity-one payment incident: The primary on-call responder for payments responds to a severity-one payment incident. [S1]\n- Who owns the payments platform: The Mercury team owns the payments platform. [S2]\n- What retry count and delay apply to payment submissions: Payment submissions may be retried up to two times with at least 30 seconds between attempts. [S3]",
+  "citations": [
+    {
+      "source_id": "S1",
+      "document": "payment-incident-runbook.md",
+      "section": "Severity-one payment incident"
+    },
+    {
+      "source_id": "S2",
+      "document": "service-ownership.md",
+      "section": "Payments platform"
+    },
+    {
+      "source_id": "S3",
+      "document": "payment-retry-policy-v2.md",
+      "section": "Payment retry policy"
+    }
+  ],
+  "goal": {
+    "objective": "Compare the payment incident runbook, service ownership guide, and current payment retry policy to determine specific operational details",
+    "entities": [],
+    "deliverables": [
+      "Who responds to a severity-one payment incident",
+      "Who owns the payments platform",
+      "What retry count and delay apply to payment submissions"
+    ],
+    "constraints": [
+      "Must be based on the payment incident runbook",
+      "Must be based on the service ownership guide",
+      "Must be based on the current payment retry policy"
+    ]
+  },
+  "plan": {
+    "goal": {
+      "objective": "Compare the payment incident runbook, service ownership guide, and current payment retry policy to determine specific operational details",
+      "entities": [],
+      "deliverables": [
+        "Who responds to a severity-one payment incident",
+        "Who owns the payments platform",
+        "What retry count and delay apply to payment submissions"
+      ],
+      "constraints": [
+        "Must be based on the payment incident runbook",
+        "Must be based on the service ownership guide",
+        "Must be based on the current payment retry policy"
+      ]
+    },
+    "steps": [
+      {
+        "step_id": "search_1",
+        "type": "search",
+        "purpose": "Who responds to a severity-one payment incident",
+        "query": "What is the response team for severity-one payment incidents according to the payment incident runbook?",
+        "deliverable_index": 0
+      },
+      {
+        "step_id": "search_2",
+        "type": "search",
+        "purpose": "Who owns the payments platform",
+        "query": "Who is the service owner for the payments platform as defined in the service ownership guide?",
+        "deliverable_index": 1
+      },
+      {
+        "step_id": "search_3",
+        "type": "search",
+        "purpose": "What retry count and delay apply to payment submissions",
+        "query": "What is the current retry policy for payment submissions, including retry count and delay?",
+        "deliverable_index": 2
+      },
+      {
+        "step_id": "synthesis",
+        "type": "synthesize",
+        "purpose": "Synthesize a cited answer from the retrieved evidence"
+      }
+    ]
+  },
+  "trace": [
+    {
+      "state": "received",
+      "elapsed_ms": 0.009999959729611874
+    },
+    {
+      "state": "analyzing",
+      "elapsed_ms": 0.013833981938660145
+    },
+    {
+      "state": "planning",
+      "elapsed_ms": 3301.503041991964
+    },
+    {
+      "state": "searching",
+      "elapsed_ms": 4986.818167031743,
+      "step_id": "search_1",
+      "tool_name": "search_documents",
+      "argument_summary": {
+        "query_chars": 103,
+        "top_k": 3
+      }
+    },
+    {
+      "state": "searched",
+      "elapsed_ms": 5302.223291946575,
+      "step_id": "search_1",
+      "result_count": 3,
+      "tool_name": "search_documents",
+      "tool_status": "ok"
+    },
+    {
+      "state": "searching",
+      "elapsed_ms": 5302.255625021644,
+      "step_id": "search_2",
+      "tool_name": "search_documents",
+      "argument_summary": {
+        "query_chars": 93,
+        "top_k": 3
+      }
+    },
+    {
+      "state": "searched",
+      "elapsed_ms": 5402.208667015657,
+      "step_id": "search_2",
+      "result_count": 3,
+      "tool_name": "search_documents",
+      "tool_status": "ok"
+    },
+    {
+      "state": "searching",
+      "elapsed_ms": 5402.229959028773,
+      "step_id": "search_3",
+      "tool_name": "search_documents",
+      "argument_summary": {
+        "query_chars": 90,
+        "top_k": 3
+      }
+    },
+    {
+      "state": "searched",
+      "elapsed_ms": 5504.430999979377,
+      "step_id": "search_3",
+      "result_count": 3,
+      "tool_name": "search_documents",
+      "tool_status": "ok"
+    },
+    {
+      "state": "evidence_selected",
+      "elapsed_ms": 5505.549874971621,
+      "result_count": 4
+    },
+    {
+      "state": "selecting_tool",
+      "elapsed_ms": 5505.842874990776
+    },
+    {
+      "state": "reading",
+      "elapsed_ms": 6301.52320896741,
+      "step_id": "read_1",
+      "tool_name": "read_document_chunks",
+      "argument_summary": {
+        "chunk_count": 3
+      }
+    },
+    {
+      "state": "read",
+      "elapsed_ms": 6306.34079198353,
+      "step_id": "read_1",
+      "result_count": 3,
+      "tool_name": "read_document_chunks",
+      "tool_status": "ok"
+    },
+    {
+      "state": "synthesizing",
+      "elapsed_ms": 6306.3704170053825,
+      "step_id": "synthesis"
+    },
+    {
+      "state": "checking",
+      "elapsed_ms": 9556.150750024244
+    },
+    {
+      "state": "correction_searching",
+      "elapsed_ms": 16128.298999974504,
+      "step_id": "correction_1",
+      "tool_name": "search_documents",
+      "argument_summary": {
+        "query_chars": 75,
+        "top_k": 3
+      }
+    },
+    {
+      "state": "correction_searched",
+      "elapsed_ms": 16268.733375007287,
+      "step_id": "correction_1",
+      "result_count": 3,
+      "tool_name": "search_documents",
+      "tool_status": "ok"
+    },
+    {
+      "state": "revising",
+      "elapsed_ms": 16268.75258400105,
+      "step_id": "correction_1"
+    },
+    {
+      "state": "checking",
+      "elapsed_ms": 19538.682791986503,
+      "step_id": "correction_1"
+    },
+    {
+      "state": "completed",
+      "elapsed_ms": 25434.214749955572
+    }
+  ],
+  "usage": {
+    "model_calls": 11,
+    "tokens": 3985,
+    "elapsed_ms": 25434.250583988614
+  },
+  "metadata": {
+    "goal_prompt_version": "4.0.0",
+    "plan_prompt_version": "4.0.0",
+    "synthesis_prompt_version": "7.0.0",
+    "generation_model": "qwen3:4b",
+    "embedding_model": "embeddinggemma",
+    "retrieval_method": "vector",
+    "max_steps": 5,
+    "max_model_calls": 11,
+    "max_tokens": 12000,
+    "max_runtime_seconds": 600,
+    "tool_selection_prompt_version": "5.1.0",
+    "max_tool_calls": 6,
+    "critic_prompt_version": "7.0.0",
+    "max_corrections": 1
+  }
+}

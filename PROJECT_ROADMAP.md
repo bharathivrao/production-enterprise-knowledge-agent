@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stages 1–6 are implemented pending owner review. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, read-only tools with a local stdio MCP adapter, and expiring capability-protected conversation sessions. It is not yet a complete agent or a production-ready enterprise service.
+Current status: Stages 1–7 are implemented. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, read-only tools with a local stdio MCP adapter, expiring capability-protected conversation sessions, and bounded evidence checking/correction. Stages 8–9 remain; this is not yet a production-ready enterprise service.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -119,7 +119,7 @@ Observed examples demonstrate why this matters: a privacy answer once omitted th
 
 ### 1. Complete ingestion and service reliability
 
-Status: completed October 3, 2026; pending owner review.
+Status: completed October 3, 2026.
 
 - [x] Support TXT, Markdown, and DOCX throughout parsing, chunking, upload validation, content-type persistence, and citations.
 - [x] Preserve meaningful section/source metadata; use nullable page numbers for unpaginated formats.
@@ -143,7 +143,7 @@ The Stage 1 migration was successfully applied to the local development database
 
 ### 2. Production retrieval and reranking
 
-Status: completed October 3, 2026; pending owner review.
+Status: completed October 3, 2026.
 
 - [x] Implement a cross-encoder reranker over retrieved candidates.
 - [x] Evaluate vector, BM25, hybrid, and reranked variants using the same corpus and dataset.
@@ -164,7 +164,7 @@ higher latency. All variants achieved complete source coverage at `k=3` on the
 
 ### 3. Evaluation and quality measurement
 
-Status: completed October 4, 2026; pending owner review.
+Status: completed October 4, 2026.
 
 - [x] Expand to approximately 50 varied questions initially; eventual expansion to 100+ remains a dataset-growth goal.
 - [x] Separate development questions from a held-out test set.
@@ -195,7 +195,7 @@ guarantee; automated grades still require human sampling.
 
 ### 4. Goal analysis and planning
 
-Status: completed October 4, 2026; pending owner review.
+Status: completed October 4, 2026.
 
 - [x] Define typed goal and plan schemas with objectives, entities, deliverables, constraints, and steps.
 - [x] Decompose complex questions into bounded subqueries.
@@ -216,7 +216,7 @@ search. The three-document run stayed within four steps, six model calls,
 
 ### 5. Tools and MCP
 
-Status: completed October 4, 2026; pending owner review.
+Status: completed October 4, 2026.
 
 - [x] Define typed search and document-reading tool interfaces.
 - [x] Add a validated dispatcher for tool selection and arguments.
@@ -238,7 +238,7 @@ Stage 7 evidence checking. See `docs/tool-policy.md`.
 
 ### 6. Working and conversation memory
 
-Status: completed October 4, 2026; pending owner review.
+Status: completed October 4, 2026.
 
 - [x] Define working memory for plan progress, evidence, tool observations, and unresolved questions.
 - [x] Add conversation sessions with capability and server-scope isolation (full user identity remains Stage 8).
@@ -259,17 +259,26 @@ retention, and newly inaccessible source titles. See `docs/memory-policy.md`.
 
 ### 7. Evidence checking and self-correction
 
-Status: citation-ID validation exists; critic and agent loop are not implemented.
+Status: implemented October 4, 2026.
 
-- [ ] Implement an evidence checker for missing support, contradictions, and incomplete coverage.
-- [ ] Separate structural citation validation from semantic support checking.
-- [ ] Search again or revise the plan when evidence is insufficient.
-- [ ] Limit retries and prevent repeated identical searches or infinite loops.
-- [ ] Carry provenance through revisions and reject invented citations.
-- [ ] Abstain or return clearly qualified partial results when attempts are exhausted.
-- [ ] Evaluate whether correction improves answers rather than reinforcing errors.
+- [x] Implement an evidence checker for missing support, contradictions, and incomplete coverage.
+- [x] Separate structural citation validation from semantic support checking.
+- [x] Search again or revise the plan when evidence is insufficient.
+- [x] Limit retries and prevent repeated identical searches or infinite loops.
+- [x] Carry provenance through revisions and reject invented citations.
+- [x] Abstain or return clearly qualified partial results when attempts are exhausted.
+- [x] Evaluate whether correction improves answers rather than reinforcing errors.
 
 Completion evidence: an initially weak answer is improved through a bounded correction cycle, or the workflow safely abstains.
+
+Evidence: focused tests cover one scoped correction search, a revised and
+rechecked answer, duplicate-query suppression, explicit-document citation
+coverage, and fail-closed behavior. In a local three-source replay, the Stage 5
+baseline cited only two requested documents; Stage 7 used one correction search
+and cited all three. Cost rose from 7 to 11 model calls and from about 13.7 to
+25.4 seconds. This single case is not a general quality claim; see
+`docs/verification-policy.md` and `evals/results/stage7-three-source-comparison.json`.
+The Stage 7 two-turn session replay also passed all five follow-up checks.
 
 ### 8. Guardrails and enterprise access controls
 
