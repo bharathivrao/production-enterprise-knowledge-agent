@@ -24,7 +24,10 @@ def test_create_session_returns_one_time_token_without_caching():
     assert response.status_code == 201
     assert response.json()["session_token"] == TOKEN
     assert response.headers["cache-control"] == "no-store"
-    assert create.call_args.kwargs["scope"].principals == ("public",)
+    assert create.call_args.kwargs["scope"].principals == (
+        "public", "user:test-user",
+    )
+    assert create.call_args.kwargs["subject"] == "test-user"
 
 
 def test_history_requires_capability_and_never_allows_caller_scope():

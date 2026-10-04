@@ -77,7 +77,10 @@ def test_existing_document_skips_processing(tmp_path):
         result = ingest_pdf(path)
 
     assert result == {**existing, "created": False}
-    lookup.assert_called_once_with(content_hash)
+    from app.retrieval.scope import PUBLIC_SCOPE
+    lookup.assert_called_once_with(
+        content_hash, tenant_id="default", scope=PUBLIC_SCOPE,
+    )
 
     prepare.assert_not_called()
     store.assert_not_called()

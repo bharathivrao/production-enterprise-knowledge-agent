@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stages 1–7 are implemented. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, read-only tools with a local stdio MCP adapter, expiring capability-protected conversation sessions, and bounded evidence checking/correction. Stages 8–9 remain; this is not yet a production-ready enterprise service.
+Current status: Stages 1–8 are implemented. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, read-only tools, subject-bound sessions, evidence checking/correction, and application-level identity/access guardrails. Stage 9 remains; this is not yet a production-ready enterprise service.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -282,19 +282,19 @@ The Stage 7 two-turn session replay also passed all five follow-up checks.
 
 ### 8. Guardrails and enterprise access controls
 
-Status: basic input checks and evidence-as-data prompting exist; dedicated guardrail modules are empty.
+Status: application-level controls implemented October 4, 2026; real IdP and infrastructure enforcement remain deployment work.
 
-- [ ] Add authentication and define user/tenant authorization.
-- [ ] Enforce document permissions consistently in ingestion, retrieval, tools, memory, and citations.
-- [ ] Make deduplication and document lookup respect the authorization boundary.
-- [ ] Test prompt injection in documents, questions, and tool output.
-- [ ] Define PII/secrets handling, redaction, logging restrictions, and retention policies.
-- [ ] Add rate limits and bounded upload, token, tool, and concurrency budgets.
-- [ ] Manage credentials securely and restrict service exposure.
-- [ ] Audit accesses and policy decisions without logging sensitive content unnecessarily.
-- [ ] Test malicious uploads, unauthorized source references, and cross-session/tenant leakage.
+- [x] Add signed access-token authentication and define user/tenant authorization.
+- [x] Enforce document permissions consistently in ingestion, retrieval, tools, memory, and citations.
+- [x] Make deduplication and document lookup respect the authorization boundary.
+- [x] Test prompt injection in documents, questions, and a synthetic legacy retrieval result.
+- [x] Define PII/secrets rejection, no-content audit logging, and retention limits; comprehensive DLP/redaction remains outside this stage.
+- [x] Add per-process rate/concurrency limits and bounded upload, token, and tool budgets.
+- [x] Define credential and network exposure requirements; TLS/secret-store/ingress implementation remains Stage 9.
+- [x] Audit accesses and policy decisions without logging sensitive content unnecessarily.
+- [x] Test malicious uploads, unauthorized source references, and cross-session/tenant leakage.
 
-Completion evidence: adversarial and authorization tests pass, and policy decisions are documented. Prompt instructions alone do not establish a security boundary.
+Completion evidence: 144 default tests pass, with 4 opt-in skips; all 8 real PostgreSQL integration tests pass separately. The local adversarial replay passes its delivery/isolation checks: cross-group retrieval cannot see the fixture, and the model's injected uncited output is blocked by citation validation. Importantly, the model **did** follow the embedded directive; this is not proof of general prompt-injection resistance. See `docs/security-policy.md` and `evals/results/stage8-security.json`. Provider integration, distributed throttling, TLS, and broader adversarial/DLP review remain deployment acceptance work.
 
 ### 9. Packaging, observability, deployment, and delivery
 

@@ -4,6 +4,15 @@ import numpy as np
 
 from app.core.config import get_settings
 from app.db.database import database_connection
+from app.retrieval.scope import RetrievalScope
+
+
+def _management_filter(scope: RetrievalScope | None) -> tuple[str, list]:
+    if scope is None:  # Trusted local maintenance callers only.
+        return "", []
+    return " AND tenant_id = %s AND access_groups && %s::text[]", [
+        scope.tenant_id, list(scope.principals),
+    ]
 
 
 def _validate_chunks(chunks, embeddings) -> None:
@@ -71,12 +80,17 @@ def store_document(filename, content_type, chunks, embeddings, *, content_hash,
 
 
 def replace_document_index(document_id, filename, content_type, chunks, embeddings,
-                           *, content_hash, source_bytes, provenance):
+                           *, content_hash, source_bytes, provenance,
+                           scope: RetrievalScope | None = None):
     """Atomically replace metadata and chunks only after processing succeeds."""
     _validate_chunks(chunks, embeddings)
     with database_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT id FROM documents WHERE id = %s FOR UPDATE", (document_id,))
+            access_filter, access_params = _management_filter(scope)
+            cursor.execute(
+                "SELECT id FROM documents WHERE id = %s" + access_filter + " FOR UPDATE",
+                [document_id, *access_params],
+            )
             if cursor.fetchone() is None:
                 return False
             cursor.execute("DELETE FROM document_chunks WHERE document_id = %s", (document_id,))
@@ -102,14 +116,21 @@ def replace_document_index(document_id, filename, content_type, chunks, embeddin
     return True
 
 
-def find_document_by_hash(content_hash, index_fingerprint=None, *, tenant_id="default"):
+def find_document_by_hash(
+    content_hash, index_fingerprint=None, *, tenant_id="default",
+    scope: RetrievalScope | None = None,
+):
     query = """
-        SELECT d.id, d.filename, COUNT(c.id), d.index_fingerprint
+        SELECT d.id, d.filename, COUNT(c.id), d.index_fingerprint,
+               d.access_groups
         FROM documents AS d
         LEFT JOIN document_chunks AS c ON c.document_id = d.id
         WHERE d.content_hash = %s AND d.tenant_id = %s
     """
     parameters = [content_hash, tenant_id]
+    if scope is not None:
+        query += " AND d.access_groups && %s::text[]"
+        parameters.append(list(scope.principals))
     if index_fingerprint is not None:
         query += " AND d.index_fingerprint = %s"
         parameters.append(index_fingerprint)
@@ -123,23 +144,36 @@ def find_document_by_hash(content_hash, index_fingerprint=None, *, tenant_id="de
     return {
         "document_id": str(row[0]), "filename": row[1],
         "chunk_count": row[2], "index_fingerprint": row[3],
+        "access_groups": tuple(row[4]),
     }
 
 
-def get_document_source(document_id: UUID | str):
+def get_document_source(
+    document_id: UUID | str, *, scope: RetrievalScope | None = None,
+):
+    access_filter, access_params = _management_filter(scope)
     with database_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT filename, source_bytes FROM documents WHERE id = %s", (document_id,))
+            cursor.execute(
+                "SELECT filename, source_bytes FROM documents WHERE id = %s"
+                + access_filter, [document_id, *access_params],
+            )
             row = cursor.fetchone()
     if row is None:
         return None
     return {"filename": row[0], "source_bytes": bytes(row[1]) if row[1] else None}
 
 
-def delete_document(document_id: UUID | str) -> bool:
+def delete_document(
+    document_id: UUID | str, *, scope: RetrievalScope | None = None,
+) -> bool:
+    access_filter, access_params = _management_filter(scope)
     with database_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM documents WHERE id = %s", (document_id,))
+            cursor.execute(
+                "DELETE FROM documents WHERE id = %s" + access_filter,
+                [document_id, *access_params],
+            )
             return cursor.rowcount == 1
 
 

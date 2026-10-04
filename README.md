@@ -2,7 +2,7 @@
 
 A production-oriented knowledge agent that ingests enterprise documents, finds permission-scoped evidence, and answers questions with citations. The project is being built in nine stages, from a transparent RAG pipeline to planning, tools, memory, self-correction, guardrails, and operational deployment.
 
-**Current status:** Stages 1–7 are implemented. Stage 3's held-out evaluation gates pass on a small local corpus; Stages 4–7 add bounded planning, read-only tools, opt-in sessions, and evidence checking. This is not a production-quality guarantee; Stages 8–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
+**Current status:** Stages 1–8 are implemented. Stage 8 adds signed-token authentication, tenant/group authorization, session ownership, and guardrail checks. The small-corpus quality and local security tests are not a production guarantee; Stage 9 operations and deployment remain. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md), [security policy](docs/security-policy.md), and [CODEX_HANDOFF.md](CODEX_HANDOFF.md).
 
 ## Original project stages
 
@@ -15,7 +15,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 | 5 | Tools and MCP | Implemented |
 | 6 | Working and conversation memory | Implemented |
 | 7 | Self-correction and evidence verification | Implemented |
-| 8 | Guardrails and enterprise access controls | Planned |
+| 8 | Guardrails and enterprise access controls | Implemented; deployment integration remains |
 | 9 | Packaging, deployment, and operations | Planned |
 
 ## Stage details
@@ -64,7 +64,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 **Measured demonstration:** A local two-turn run answered a severity-one payment incident question from the incident runbook, resolved “Who owns that service?” to the payments platform, ran a fresh tool search, and cited the ownership guide. All five scenario checks passed. PostgreSQL tests cover wrong-token and wrong-tenant isolation, concurrent writes, retention, expiry, reset, deletion, and source-title reauthorization.
 
-**Important limit:** The session token is only an opaque bearer capability, not a user identity. Sessions currently use the public server scope; authentication, rate limiting, delegated tenant access, and production sensitive-data policy are Stage 8 work.
+**Important limit:** The session token is a separate opaque capability, not a user identity. Stage 8 binds sessions to a verified subject and tenant/scope as well; the capability must still be protected.
 
 ### Stage 7 — Self-correction
 
@@ -74,11 +74,9 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 ### Stage 8 — Guardrails
 
-**Built so far:** Request validation, upload limits, evidence-as-data instructions, citation ID validation, and controlled model dependency errors.
+**Built:** Provider-neutral RS256 JWT access-token validation against configured issuer, audience, and HTTPS JWKS; identity-derived tenant/group/subject scope; private-by-default uploads and role-gated sharing/management; subject-bound sessions; scoped deduplication; recognizable secret/high-risk PII and document-instruction rejection; per-process rate and concurrency gates; and metadata-only security audit events. See [security policy](docs/security-policy.md) for the precise contract and limitations.
 
-**Planned:** Authentication and authorization; tenant and document access enforcement across ingestion, retrieval, tools, memory, and citations; prompt-injection testing; sensitive-data and logging policies; rate and resource limits; and audit behavior.
-
-**Target demonstration:** A user cannot retrieve another user's documents, malicious document text cannot override system instructions, and unsupported claims produce an abstention or a clearly qualified answer. Prompt wording alone is not an access-control boundary.
+**Adversarial result:** A synthetic legacy document's embedded directive did influence the local model, but citation validation rejected the uncited result before `/ask` could deliver it. Cross-group retrieval returned no fixture document. This does **not** prove robust prompt-injection resistance; subtler cited attacks and broader DLP remain open risks.
 
 ### Stage 9 — Packaging and operations
 
@@ -126,7 +124,7 @@ Complex question → Typed goal → Validated search plan → Scoped search tool
 Session token + recent user turns → Follow-up resolver → Fresh scoped workflow
 ```
 
-Stage 4 adds the opt-in planning path; Stage 5 adds the tool-enabled path; Stage 6 adds bounded sessions; Stage 7 adds one-pass evidence checking and correction. Stage 8 applies identity, access, and safety controls across the workflow.
+Stages 4–7 add planning, read-only tools, sessions, and evidence correction. Stage 8 derives the tenant/group scope from a verified bearer identity before the API enters these workflows; the session capability is additionally bound to the verified subject.
 
 ## Technology
 
@@ -137,6 +135,7 @@ Stage 4 adds the opt-in planning path; Stage 5 adds the tool-enabled path; Stage
 - Sentence Transformers cross-encoder for optional reranking
 - PyMuPDF, python-docx, tiktoken
 - Official Python MCP SDK for the local stdio tool adapter
+- PyJWT with cryptography for RS256 access-token validation
 - Docker Compose and pytest
 
 ## Run locally
@@ -150,7 +149,10 @@ Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama
    cp .env.example .env
    ```
 
-   Set `POSTGRES_PASSWORD` in `.env` to a local development password.
+   Set `POSTGRES_PASSWORD` in `.env` to a local development password. Set
+   `AUTH_ISSUER`, `AUTH_AUDIENCE`, and HTTPS `AUTH_JWKS_URL` for an identity
+   provider that issues `at+jwt` RS256 access tokens with `tenant_id`, `groups`,
+   and `roles` claims. Protected endpoints fail closed without this setup.
 
 2. Start PostgreSQL/pgvector:
 
@@ -188,30 +190,35 @@ Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama
    RUN_POSTGRES_INTEGRATION=1 uv run pytest -q tests/integration
    ```
 
-   The Stage 7 default suite passed 123 tests with 3 opt-in skips; all six
-   PostgreSQL integration tests passed separately. See [verification policy](docs/verification-policy.md).
+   The Stage 8 default suite passes 144 tests with 4 opt-in skips; all eight
+   PostgreSQL integration tests pass separately. See [security policy](docs/security-policy.md).
 
 Configuration is documented in [.env.example](.env.example). Do not commit a real `.env`.
-For an existing PostgreSQL volume, apply [the Stage 6 additive migration](scripts/migrate_stage6.sql) before using sessions; fresh volumes receive the tables from `scripts/schema.sql`. The exact command is in [memory policy](docs/memory-policy.md).
+For an existing PostgreSQL volume, apply earlier additive migrations, then the [Stage 8 migration](scripts/migrate_stage8.sql) to bind sessions to subjects. Fresh volumes receive the schema from `scripts/schema.sql`. For the configured local Compose database:
+
+```bash
+docker compose exec -T db psql -v ON_ERROR_STOP=1 -U knowledge_agent -d knowledge_agent -f /dev/stdin < scripts/migrate_stage8.sql
+```
 
 ## API overview
 
-- `GET /health` and `GET /health/liveness`: service health endpoints.
-- `POST /documents`: upload a PDF, TXT, Markdown, or DOCX document.
+- `GET /health` and `GET /health/liveness`: public shallow service health endpoints. `GET /health/readiness` requires a bearer token.
+- `POST /documents`: upload a PDF, TXT, Markdown, or DOCX document. Requires `document:write`; private to the signed subject by default. Multipart `access_groups` can share to verified groups, with `document:publish` required for `public`.
 - `POST /search`: retrieve evidence without answer generation.
 - `POST /ask`: answer from retrieved evidence with citations or abstain.
 - `POST /ask/planned`: analyze a goal, run a bounded read-only search plan, and return cited findings or a clarification. Body: `{"query":"...","top_k":3}`; response includes `state`, `answer`, `citations`, `goal`, `plan`, `trace`, `usage`, and `metadata`.
 - `POST /ask/tools`: use the validated read-only search and chunk-reading tools for the same bounded answer workflow. The body is `{"query":"...","top_k":3}`; caller-supplied scope is rejected.
-- `POST /sessions`: create an expiring session; returns its ID and a one-time bearer token.
+- `POST /sessions`: create an expiring, subject-bound session; returns its ID and a one-time capability token.
 - `POST /sessions/{session_id}/ask`: answer a follow-up with `X-Session-Token` and `{"query":"...","top_k":3}`.
 - `GET /sessions/{session_id}`, `POST /sessions/{session_id}/reset`, and `DELETE /sessions/{session_id}`: inspect, clear, or delete that session with the same token.
 
-Use the OpenAPI page at `/docs` for request schemas and response examples. Available retrieval settings and filters are defined by the API request model.
+All document/query/session routes require `Authorization: Bearer <access token>` from the configured IdP. Document replace/reindex/delete additionally require `document:manage`; session routes also require `X-Session-Token`. Use the OpenAPI page at `/docs` for request schemas and response examples.
 
 For example, after ingesting the sample corpus:
 
 ```bash
 curl -sS -X POST http://127.0.0.1:8000/ask/tools \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"query":"Compare the payment incident runbook and service ownership guide: who responds to a severity-one payment incident and who owns the payments platform?","top_k":3}'
 ```

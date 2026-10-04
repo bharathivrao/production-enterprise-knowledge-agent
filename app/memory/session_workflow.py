@@ -49,6 +49,7 @@ class SessionAnswerResult(BaseModel):
 def answer_in_session(
     session_id: UUID, token: str, question: str, *, top_k: int = 3,
     scope: RetrievalScope = PUBLIC_SCOPE,
+    subject: str = "legacy",
 ) -> SessionAnswerResult:
     if not question.strip() or len(question) > 2000:
         raise ValueError("question must contain 1 to 2000 characters")
@@ -56,7 +57,7 @@ def answer_in_session(
         raise ValueError("top_k must be between 1 and 3")
     started = perf_counter()
     settings = get_settings()
-    snapshot = load_session(session_id, token, scope=scope)
+    snapshot = load_session(session_id, token, scope=scope, subject=subject)
     remembered_titles = {
         citation["document"] for turn in snapshot.turns
         for citation in turn.citations
@@ -111,6 +112,7 @@ def answer_in_session(
         answer=answer,
         citations=[item.model_dump(exclude_none=True) for item in citations],
         state=state,
+        subject=subject,
     )
     return SessionAnswerResult(
         session_id=session_id, turn_id=turn_id, state=state,

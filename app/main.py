@@ -1,5 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
+from threading import BoundedSemaphore, Lock
 
 import ollama
 import psycopg
@@ -32,6 +33,35 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Production Enterprise Knowledge Agent", lifespan=lifespan)
+_admission_lock = Lock()
+_admission_limit = None
+_admission_semaphore = None
+
+
+def _request_semaphore():
+    global _admission_limit, _admission_semaphore
+    limit = get_settings().max_concurrent_requests
+    with _admission_lock:
+        if _admission_limit != limit or _admission_semaphore is None:
+            _admission_limit = limit
+            _admission_semaphore = BoundedSemaphore(limit)
+        return _admission_semaphore
+
+
+@app.middleware("http")
+async def bound_concurrent_requests(request: Request, call_next):
+    if request.url.path in ("/", "/health", "/health/liveness"):
+        return await call_next(request)
+    semaphore = _request_semaphore()
+    if not semaphore.acquire(blocking=False):
+        return JSONResponse(
+            status_code=429, headers={"Retry-After": "1"},
+            content={"detail": "The service is busy. Try again later."},
+        )
+    try:
+        return await call_next(request)
+    finally:
+        semaphore.release()
 
 
 @app.middleware("http")

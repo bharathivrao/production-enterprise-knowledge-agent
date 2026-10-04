@@ -34,7 +34,9 @@ def test_ask_returns_valid_answer():
     pipeline.assert_called_once_with(
         "What is the formula?",
         top_k=3,
+        scope=pipeline.call_args.kwargs["scope"],
     )
+    assert pipeline.call_args.kwargs["scope"].tenant_id == "default"
 
 def test_ask_with_invalid_input_returns_422():
     
@@ -175,7 +177,9 @@ def test_search_can_select_reranked_retrieval():
         )
     assert response.status_code == 200
     assert response.json() == {"results": expected}
-    search.assert_called_once_with("policy", 3)
+    search.assert_called_once_with(
+        "policy", 3, scope=search.call_args.kwargs["scope"],
+    )
 
 
 def test_reranker_failure_returns_503():

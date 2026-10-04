@@ -56,8 +56,9 @@ def _token_hash(token: str) -> str:
     return sha256(token.encode("utf-8")).hexdigest()
 
 
-def _scope_matches(row: tuple, scope: RetrievalScope) -> bool:
-    return row[1] == scope.tenant_id and set(row[2]) == set(scope.principals)
+def _scope_matches(row: tuple, scope: RetrievalScope, subject: str) -> bool:
+    return (row[1] == scope.tenant_id and row[2] == subject
+            and set(row[3]) == set(scope.principals))
 
 
 def purge_expired_sessions() -> int:
@@ -70,7 +71,7 @@ def purge_expired_sessions() -> int:
             return cursor.rowcount
 
 
-def create_session(*, scope: RetrievalScope) -> SessionCreated:
+def create_session(*, scope: RetrievalScope, subject: str = "legacy") -> SessionCreated:
     settings = get_settings()
     purge_expired_sessions()
     session_id = uuid4()
@@ -82,10 +83,11 @@ def create_session(*, scope: RetrievalScope) -> SessionCreated:
             cursor.execute(
                 """
                 INSERT INTO conversation_sessions
-                    (id, token_hash, tenant_id, principals, created_at, expires_at)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                    (id, token_hash, tenant_id, owner_subject, principals,
+                     created_at, expires_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
-                (session_id, _token_hash(token), scope.tenant_id,
+                (session_id, _token_hash(token), scope.tenant_id, subject,
                  list(scope.principals), now, expires_at),
             )
     return SessionCreated(
@@ -95,20 +97,22 @@ def create_session(*, scope: RetrievalScope) -> SessionCreated:
 
 def load_session(
     session_id: UUID, token: str, *, scope: RetrievalScope,
+    subject: str = "legacy",
 ) -> SessionSnapshot:
     settings = get_settings()
     with database_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT token_hash, tenant_id, principals, version, created_at, expires_at
+                SELECT token_hash, tenant_id, owner_subject, principals,
+                       version, created_at, expires_at
                 FROM conversation_sessions
                 WHERE id = %s AND expires_at > CURRENT_TIMESTAMP
                 """,
                 (session_id,),
             )
             row = cursor.fetchone()
-            if row is None or not _scope_matches(row, scope) or not hmac.compare_digest(
+            if row is None or not _scope_matches(row, scope, subject) or not hmac.compare_digest(
                 row[0], _token_hash(token),
             ):
                 raise SessionNotFound("Session not found")
@@ -125,8 +129,8 @@ def load_session(
             )
             turn_rows = cursor.fetchall()
     return SessionSnapshot(
-        session_id=session_id, version=row[3], created_at=row[4],
-        expires_at=row[5],
+        session_id=session_id, version=row[4], created_at=row[5],
+        expires_at=row[6],
         turns=[StoredTurn(
             turn_id=item[0], turn_index=item[1], user_question=item[2],
             resolved_question=item[3], answer=item[4], citations=item[5],
@@ -154,6 +158,7 @@ def append_turn(
     session_id: UUID, token: str, *, scope: RetrievalScope,
     expected_version: int, user_question: str, resolved_question: str,
     answer: str, citations: list[dict], state: Literal["completed", "clarification"],
+    subject: str = "legacy",
 ) -> UUID:
     settings = get_settings()
     turn_id = uuid4()
@@ -164,11 +169,12 @@ def append_turn(
                 UPDATE conversation_sessions
                 SET version = version + 1
                 WHERE id = %s AND token_hash = %s AND tenant_id = %s
+                  AND owner_subject = %s
                   AND principals = %s AND version = %s
                   AND expires_at > CURRENT_TIMESTAMP
                 RETURNING version
                 """,
-                (session_id, _token_hash(token), scope.tenant_id,
+                (session_id, _token_hash(token), scope.tenant_id, subject,
                  list(scope.principals), expected_version),
             )
             row = cursor.fetchone()
@@ -195,16 +201,20 @@ def append_turn(
     return turn_id
 
 
-def reset_session(session_id: UUID, token: str, *, scope: RetrievalScope) -> None:
+def reset_session(
+    session_id: UUID, token: str, *, scope: RetrievalScope,
+    subject: str = "legacy",
+) -> None:
     with database_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 """
                 UPDATE conversation_sessions SET version = version + 1
                 WHERE id = %s AND token_hash = %s AND tenant_id = %s
+                  AND owner_subject = %s
                   AND principals = %s AND expires_at > CURRENT_TIMESTAMP
                 """,
-                (session_id, _token_hash(token), scope.tenant_id,
+                (session_id, _token_hash(token), scope.tenant_id, subject,
                  list(scope.principals)),
             )
             if cursor.rowcount != 1:
@@ -215,16 +225,20 @@ def reset_session(session_id: UUID, token: str, *, scope: RetrievalScope) -> Non
             )
 
 
-def delete_session(session_id: UUID, token: str, *, scope: RetrievalScope) -> None:
+def delete_session(
+    session_id: UUID, token: str, *, scope: RetrievalScope,
+    subject: str = "legacy",
+) -> None:
     with database_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 """
                 DELETE FROM conversation_sessions
                 WHERE id = %s AND token_hash = %s AND tenant_id = %s
+                  AND owner_subject = %s
                   AND principals = %s
                 """,
-                (session_id, _token_hash(token), scope.tenant_id,
+                (session_id, _token_hash(token), scope.tenant_id, subject,
                  list(scope.principals)),
             )
             if cursor.rowcount != 1:

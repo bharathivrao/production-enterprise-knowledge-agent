@@ -1,9 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 import logging
 import ollama
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 from app.agents.goal_analyzer import InvalidGoalAnalysis
+from app.guardrails.auth import Actor, audit, get_actor
+from app.guardrails.pii import contains_credential, contains_high_risk_pii
 from app.agents.planner import InvalidPlan
 from app.agents.synthesizer import InvalidSynthesis
 from app.agents.tool_selector import InvalidToolChoice
@@ -28,7 +30,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["retrieval"])
 
 class SearchRequest(BaseModel):
-    model_config = ConfigDict(str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     query: str = Field(min_length=1, max_length=2000)
     top_k: int = Field(default=5, ge=1, le=20)
@@ -52,7 +54,10 @@ class PlannedAskRequest(BaseModel):
     top_k: int = Field(default=3, ge=1, le=3)
 
 @router.post("/search")
-def search(request: SearchRequest):
+def search(request: SearchRequest, actor: Actor = Depends(get_actor)):
+    if contains_credential(request.query) or contains_high_risk_pii(request.query):
+        raise HTTPException(422, "Do not submit sensitive values in queries.")
+    audit("search", "allow", actor)
     try:
         searches = {
             "vector": search_chunks,
@@ -60,7 +65,9 @@ def search(request: SearchRequest):
             "hybrid": search_hybrid,
             "reranked": search_reranked,
         }
-        results = searches[request.retriever](request.query, request.top_k)
+        results = searches[request.retriever](
+            request.query, request.top_k, scope=actor.scope,
+        )
         return {"results": results}
     except ConnectionError as error:
         logger.exception("Model service connection failed")
@@ -87,12 +94,16 @@ def search(request: SearchRequest):
     
 
 @router.post("/ask", response_model=AnswerResponse, response_model_exclude_none=True)
-def ask(request: SearchRequest):
+def ask(request: SearchRequest, actor: Actor = Depends(get_actor)):
+    if contains_credential(request.query) or contains_high_risk_pii(request.query):
+        raise HTTPException(422, "Do not submit sensitive values in queries.")
+    audit("ask", "allow", actor)
     try:
         if request.retriever == "vector":
-            return answer_question(request.query, top_k=request.top_k)
+            return answer_question(request.query, top_k=request.top_k, scope=actor.scope)
         return answer_question(
             request.query, top_k=request.top_k, retriever=request.retriever,
+            scope=actor.scope,
         )
     except CitationValidationError as error:
         logger.exception("Generated answer failed citation validation")
@@ -126,18 +137,21 @@ def ask(request: SearchRequest):
 
 
 @router.post("/ask/planned", response_model=WorkflowResult, response_model_exclude_none=True)
-def ask_planned(request: PlannedAskRequest):
-    return _answer_workflow(request, run_planned_answer)
+def ask_planned(request: PlannedAskRequest, actor: Actor = Depends(get_actor)):
+    return _answer_workflow(request, run_planned_answer, actor)
 
 
 @router.post("/ask/tools", response_model=WorkflowResult, response_model_exclude_none=True)
-def ask_tools(request: PlannedAskRequest):
-    return _answer_workflow(request, run_tool_answer)
+def ask_tools(request: PlannedAskRequest, actor: Actor = Depends(get_actor)):
+    return _answer_workflow(request, run_tool_answer, actor)
 
 
-def _answer_workflow(request: PlannedAskRequest, runner):
+def _answer_workflow(request: PlannedAskRequest, runner, actor: Actor):
+    if contains_credential(request.query) or contains_high_risk_pii(request.query):
+        raise HTTPException(422, "Do not submit sensitive values in queries.")
+    audit("ask_workflow", "allow", actor)
     try:
-        return runner(request.query, top_k=request.top_k)
+        return runner(request.query, top_k=request.top_k, scope=actor.scope)
     except WorkflowRunError as error:
         cause = error.cause
         if isinstance(cause, WorkflowBudgetExceeded):

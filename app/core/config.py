@@ -48,6 +48,17 @@ class Settings(BaseSettings):
     session_max_tokens: int = Field(default=14000, ge=2048)
     session_max_runtime_seconds: int = Field(default=750, ge=60)
 
+    auth_issuer: str = ""
+    auth_audience: str = ""
+    auth_jwks_url: str = ""
+    auth_tenant_claim: str = "tenant_id"
+    auth_groups_claim: str = "groups"
+    auth_roles_claim: str = "roles"
+    auth_jwks_timeout_seconds: int = Field(default=3, ge=1, le=15)
+    auth_jwks_cache_seconds: int = Field(default=300, ge=30, le=3600)
+    rate_limit_requests_per_minute: int = Field(default=60, ge=1, le=10000)
+    max_concurrent_requests: int = Field(default=8, ge=1, le=128)
+
     chunk_size: int = Field(default=400, ge=1)
     chunk_overlap: int = Field(default=50, ge=0)
     max_upload_bytes: int = Field(default=10 * 1024 * 1024, ge=1)

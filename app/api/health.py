@@ -1,7 +1,9 @@
 import httpx
 import psycopg
 from psycopg_pool import PoolTimeout
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Depends, Response, status
+
+from app.guardrails.auth import Actor, get_actor
 
 from app.core.model_client import model_ready
 from app.db.database import database_ready
@@ -22,7 +24,7 @@ def liveness_check():
 
 
 @router.get("/readiness")
-def readiness_check(response: Response):
+def readiness_check(response: Response, actor: Actor = Depends(get_actor)):
     dependencies = {"database": "unavailable", "model_service": "unavailable"}
     try:
         if database_ready():

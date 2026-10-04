@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS conversation_sessions (
     id UUID PRIMARY KEY,
     token_hash TEXT NOT NULL CHECK (token_hash ~ '^[0-9a-f]{64}$'),
     tenant_id TEXT NOT NULL,
+    owner_subject TEXT NOT NULL,
     principals TEXT[] NOT NULL CHECK (cardinality(principals) > 0),
     version INTEGER NOT NULL DEFAULT 0 CHECK (version >= 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

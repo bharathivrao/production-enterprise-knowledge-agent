@@ -3,7 +3,7 @@
 import logging
 from uuid import UUID
 
-from fastapi import APIRouter, Header, HTTPException, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Response
 import httpx
 import ollama
 from pydantic import BaseModel, ConfigDict, Field
@@ -11,6 +11,8 @@ import psycopg
 from psycopg_pool import PoolTimeout
 
 from app.agents.workflow import WorkflowBudgetExceeded, WorkflowRunError
+from app.guardrails.auth import Actor, audit, get_actor
+from app.guardrails.pii import contains_credential, contains_high_risk_pii
 from app.memory.conversation_memory import (
     SessionConflict, SessionCreated, SessionNotFound, SessionSnapshot,
     create_session, delete_session, load_session, reset_session,
@@ -19,7 +21,6 @@ from app.memory.session_workflow import (
     SessionAnswerResult, SessionBudgetExceeded, answer_in_session,
 )
 from app.memory.working_memory import InvalidFollowup
-from app.retrieval.scope import PUBLIC_SCOPE
 from app.tools.dispatcher import ToolError
 
 
@@ -70,20 +71,27 @@ def _session_error(error: Exception) -> HTTPException:
 
 
 @router.post("", response_model=SessionCreated, status_code=201)
-def create(response: Response):
+def create(response: Response, actor: Actor = Depends(get_actor)):
     _no_store(response)
-    return create_session(scope=PUBLIC_SCOPE)
+    audit("session_create", "allow", actor)
+    return create_session(scope=actor.scope, subject=actor.subject)
 
 
 @router.get("/{session_id}", response_model=SessionSnapshot)
 def get_history(
     session_id: UUID, response: Response,
     session_token: str = Header(alias="X-Session-Token", min_length=20),
+    actor: Actor = Depends(get_actor),
 ):
     _no_store(response)
     try:
-        return load_session(session_id, session_token, scope=PUBLIC_SCOPE)
+        snapshot = load_session(
+            session_id, session_token, scope=actor.scope, subject=actor.subject,
+        )
+        audit("session_history", "allow", actor)
+        return snapshot
     except SessionNotFound as error:
+        audit("session_history", "deny", actor)
         raise _session_error(error) from error
 
 
@@ -92,15 +100,21 @@ def get_history(
 def ask_in_session(
     session_id: UUID, request: SessionAskRequest, response: Response,
     session_token: str = Header(alias="X-Session-Token", min_length=20),
+    actor: Actor = Depends(get_actor),
 ):
     _no_store(response)
+    if contains_credential(request.query) or contains_high_risk_pii(request.query):
+        raise HTTPException(422, "Do not submit sensitive values in queries.")
     try:
-        return answer_in_session(
+        result = answer_in_session(
             session_id, session_token, request.query,
-            top_k=request.top_k, scope=PUBLIC_SCOPE,
+            top_k=request.top_k, scope=actor.scope, subject=actor.subject,
         )
+        audit("session_ask", "allow", actor)
+        return result
     except (SessionNotFound, SessionConflict, SessionBudgetExceeded,
             InvalidFollowup, WorkflowRunError) as error:
+        audit("session_ask", "deny", actor)
         raise _session_error(error) from error
 
 
@@ -108,10 +122,15 @@ def ask_in_session(
 def reset(
     session_id: UUID,
     session_token: str = Header(alias="X-Session-Token", min_length=20),
+    actor: Actor = Depends(get_actor),
 ):
     try:
-        reset_session(session_id, session_token, scope=PUBLIC_SCOPE)
+        reset_session(
+            session_id, session_token, scope=actor.scope, subject=actor.subject,
+        )
+        audit("session_reset", "allow", actor)
     except SessionNotFound as error:
+        audit("session_reset", "deny", actor)
         raise _session_error(error) from error
     return Response(status_code=204, headers={"Cache-Control": "no-store"})
 
@@ -120,9 +139,14 @@ def reset(
 def delete(
     session_id: UUID,
     session_token: str = Header(alias="X-Session-Token", min_length=20),
+    actor: Actor = Depends(get_actor),
 ):
     try:
-        delete_session(session_id, session_token, scope=PUBLIC_SCOPE)
+        delete_session(
+            session_id, session_token, scope=actor.scope, subject=actor.subject,
+        )
+        audit("session_delete", "allow", actor)
     except SessionNotFound as error:
+        audit("session_delete", "deny", actor)
         raise _session_error(error) from error
     return Response(status_code=204, headers={"Cache-Control": "no-store"})

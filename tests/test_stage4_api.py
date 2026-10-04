@@ -32,7 +32,10 @@ def test_planned_endpoint_returns_clarification_trace():
 
     assert response.status_code == 200
     assert response.json()["state"] == "clarification"
-    workflow.assert_called_once_with("What should I do next?", top_k=3)
+    workflow.assert_called_once_with(
+        "What should I do next?", top_k=3,
+        scope=workflow.call_args.kwargs["scope"],
+    )
 
 
 def test_planned_endpoint_rejects_user_supplied_scope():
