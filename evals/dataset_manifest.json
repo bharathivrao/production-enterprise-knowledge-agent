@@ -1,0 +1,44 @@
+{
+  "dataset_version": "3.1.0",
+  "corpus_version": "stage2-2026-10-03",
+  "description": "Fifty enterprise knowledge cases with development and held-out test splits.",
+  "development_ids": [
+    "settlement-retry-exhausted", "settlement-replay-wait", "six-part-prompt-formula",
+    "failed-settlement-batches", "replaying-a-failed-batch", "learn-an-unfamiliar-subject",
+    "failed-recovery", "study-with-ai", "approve-settlement-batch", "privacy-before-sharing",
+    "code-review-criteria", "goal-to-plan", "privacy-redaction-tool",
+    "sev1-payment-response-multi-document", "current-payment-retry-version",
+    "prompt-role-component", "weak-answer-iteration", "accuracy-check-categories",
+    "writing-upgrade-guidance", "decision-comparison-criteria", "research-source-priority",
+    "privacy-sensitive-categories", "direct-answer-style", "improve-prompt-components",
+    "summary-required-elements", "document-analysis-fields", "self-check-items",
+    "settlement-recovery-owner", "sev1-first-actions", "incident-commander-role",
+    "incident-recovery-validation", "payments-platform-owner", "current-retry-count-paraphrase",
+    "unsupported-customer-notification", "unsupported-dead-letter-retention"
+  ],
+  "test_ids": [
+    "running-failed-batch", "settlement-retry-delay", "payment-owner-and-recovery-validation",
+    "research-evidence-inference", "beginner-mode-jargon", "challenge-hidden-risks",
+    "interview-practice-flow", "incident-smallest-recovery", "identity-platform-owner",
+    "commander-technical-authority", "current-retry-delay-paraphrase",
+    "adversarial-ignore-retry-policy", "unsupported-privacy-retention",
+    "ambiguous-what-should-i-do", "unsupported-retry-approver-version2"
+  ],
+  "coverage": {
+    "multi_document": [
+      "sev1-payment-response-multi-document", "payment-owner-and-recovery-validation"
+    ],
+    "conflicting_or_versioned": [
+      "current-payment-retry-version", "current-retry-count-paraphrase",
+      "current-retry-delay-paraphrase", "adversarial-ignore-retry-policy"
+    ],
+    "ambiguous": ["ambiguous-what-should-i-do"],
+    "adversarial": ["adversarial-ignore-retry-policy"],
+    "unsupported": [
+      "settlement-replay-wait", "approve-settlement-batch", "settlement-retry-delay",
+      "privacy-redaction-tool", "unsupported-customer-notification",
+      "unsupported-dead-letter-retention", "unsupported-privacy-retention",
+      "ambiguous-what-should-i-do", "unsupported-retry-approver-version2"
+    ]
+  }
+}

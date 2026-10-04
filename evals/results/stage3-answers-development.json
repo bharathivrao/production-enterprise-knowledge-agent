@@ -1,0 +1,2138 @@
+{
+  "report_version": "3.0.0",
+  "partial": false,
+  "generated_at": "2026-10-04T03:36:13.961364+00:00",
+  "split": "development",
+  "dataset_version": "3.1.0",
+  "dataset_sha256": "6283fe9871e21a02bd225bf83a8aa1d939e59fd158949aa5ade4095f05ea81a8",
+  "corpus_version": "stage2-2026-10-03",
+  "corpus_sha256": "9d189cf8792623ab11821c3494e2696aa1e3d95c4ff96970e10e85e3886b7850",
+  "prompt_version": "3.1.0",
+  "prompt_sha256": "24a435cf40e57ca31ff0f6c5fd0abf37175be36b9915bad97bcaa3dd2cdcadad",
+  "grader_prompt_version": "1.1.0",
+  "models": {
+    "embedding": "embeddinggemma",
+    "generation": "qwen3:4b",
+    "grader": "gemma4:e4b"
+  },
+  "retrieval": {
+    "name": "vector",
+    "top_k": 3
+  },
+  "expected_cases": 35,
+  "completed_cases": 35,
+  "failure_count": 0,
+  "failures": [],
+  "metrics": {
+    "factual_correctness": 3.914285714285714,
+    "completeness": 3.7714285714285714,
+    "faithfulness": 4,
+    "answer_relevance": 4,
+    "claim_citation_support": 0.9714285714285714,
+    "abstention_accuracy": 1,
+    "citation_source_accuracy": 0.9714285714285714,
+    "success_rate": 1.0
+  },
+  "latency_ms": {
+    "retrieval": {
+      "min": 987.9601249704137,
+      "mean": 1485.9755155730195,
+      "p50": 1315.7315829303116,
+      "p95": 2074.404832907021,
+      "p99": 2253.3191250404343,
+      "max": 2600.312541006133
+    },
+    "generation": {
+      "min": 11735.400500008836,
+      "mean": 24405.125059573245,
+      "p50": 18014.359583961777,
+      "p95": 42830.023167072795,
+      "p99": 48861.73291702289,
+      "max": 72950.2867909614
+    },
+    "grader": {
+      "min": 11264.813916,
+      "mean": 15909.531892885714,
+      "p50": 15361.019,
+      "p95": 21399.584709,
+      "p99": 22138.218875,
+      "max": 22220.306125
+    },
+    "total": {
+      "min": 26218.567957939616,
+      "mean": 41800.63246803198,
+      "p50": 37037.0074590055,
+      "p95": 61770.38724902433,
+      "p99": 67847.50304193792,
+      "max": 91570.7281249589
+    },
+    "answer_total": {
+      "min": 13051.866916939616,
+      "mean": 25891.100575146265,
+      "p50": 19330.09116689209,
+      "p95": 44367.002916987985,
+      "p99": 50838.74291693792,
+      "max": 74236.2577499589
+    }
+  },
+  "tokens": {
+    "answer_prompt_tokens": 23472,
+    "answer_completion_tokens": 30932,
+    "grader_prompt_tokens": 28907,
+    "grader_completion_tokens": 7248,
+    "context_tokens": 13924
+  },
+  "estimated_cost_usd": 0.0,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "question": "What happens after settlement retries are exhausted?",
+      "answerable": true,
+      "expected_answer": "After the third failed attempt, the batch moves to the settlement dead-letter queue.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "After settlement retries are exhausted (after three failed attempts), the batch is moved to the settlement dead-letter queue [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "After settlement retries are exhausted (after three failed attempts), the batch is moved to the settlement dead-letter queue.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer accurately reflects the information provided in the expected answer and evidence [S1]. The claim is fully supported by [S1].",
+      "usage": {
+        "answer_prompt_tokens": 421,
+        "answer_completion_tokens": 545,
+        "grader_prompt_tokens": 539,
+        "grader_completion_tokens": 146,
+        "context_tokens": 151,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 987.9601249704137,
+        "generation": 15005.595583003014,
+        "grader": 18363.1105,
+        "total": 34356.66620797342
+      }
+    },
+    {
+      "id": "settlement-replay-wait",
+      "question": "How many minutes should the operator wait before replaying the settlement batch?",
+      "answerable": false,
+      "expected_answer": "The available documents do not contain enough information.",
+      "expected_behavior": "abstain",
+      "relevant_documents": [],
+      "relevant_pages": [],
+      "actual_answer": "The available documents do not contain enough information.",
+      "citations": [],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The available documents do not contain enough information regarding the waiting time before replaying a settlement batch.",
+          "cited_source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer states that the documents lack sufficient information. The actual answer mirrors this statement. Evidence [S1] mentions that an operator must investigate a failure before replaying a batch but does not specify a waiting time in minutes. Evidence [S2] and [S3] discuss other topics (recovery owner, payment retry policy) without mentioning a specific wait time for settlement batch replay. Therefore, the conclusion that the information is insufficient is fully supported by the evidence.",
+      "usage": {
+        "answer_prompt_tokens": 427,
+        "answer_completion_tokens": 1646,
+        "grader_prompt_tokens": 518,
+        "grader_completion_tokens": 215,
+        "context_tokens": 151,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1914.1789170680568,
+        "generation": 40639.05012502801,
+        "grader": 13723.923708,
+        "total": 56277.152750096066
+      }
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "question": "What is the six-part prompt formula?",
+      "answerable": true,
+      "expected_answer": "ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The six-part prompt formula is ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The six-part prompt formula is ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer correctly states the six-part prompt formula as 'ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK.' This information is directly present in [S1]. The response fully meets the expected answer.",
+      "usage": {
+        "answer_prompt_tokens": 963,
+        "answer_completion_tokens": 346,
+        "grader_prompt_tokens": 1156,
+        "grader_completion_tokens": 162,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1316.4664169307798,
+        "generation": 11735.400500008836,
+        "grader": 13166.701041,
+        "total": 26218.567957939616
+      }
+    },
+    {
+      "id": "failed-settlement-batches",
+      "question": "How many times are failed settlement batches retried?",
+      "answerable": true,
+      "expected_answer": "Up to three times",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The available documents indicate that failed settlement batches are retried up to three times. This is explicitly stated in [S1]: \"Failed settlement batches are retried up to three times. After the third failed attempt, the batch is moved to the settlement dead-letter queue.\"",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "Failed settlement batches are retried up to three times.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer correctly states that failed settlement batches are retried up to three times. This information is directly supported by [S1]. The expected answer was 'Up to three times', and the actual answer provides this exact information while also citing the source.",
+      "usage": {
+        "answer_prompt_tokens": 423,
+        "answer_completion_tokens": 533,
+        "grader_prompt_tokens": 556,
+        "grader_completion_tokens": 156,
+        "context_tokens": 151,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1267.1017920365557,
+        "generation": 14818.407292012125,
+        "grader": 11703.406584,
+        "total": 27788.91566804868
+      }
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "question": "What must the operator do before replaying a failed batch?",
+      "answerable": true,
+      "expected_answer": "The operator must investigate the failure before replaying the batch ",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The operator must investigate the failure before replaying the batch [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The operator must investigate the failure before replaying the batch.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer correctly states that 'The operator must investigate the failure before replaying the batch,' which is directly stated in source [S1]. The expected answer requires this exact information. All dimensions are fully met.",
+      "usage": {
+        "answer_prompt_tokens": 425,
+        "answer_completion_tokens": 614,
+        "grader_prompt_tokens": 525,
+        "grader_completion_tokens": 149,
+        "context_tokens": 151,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1315.099542029202,
+        "generation": 16594.146375078708,
+        "grader": 11264.813916,
+        "total": 29174.05983310791
+      }
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "question": "How should I learn an unfamiliar subject?",
+      "answerable": true,
+      "expected_answer": "Teach this in four layers: intuition, simple example, technical explanation, then a short quiz. Do not continue until I answer the checkpoint.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "For unfamiliar subjects, teach in four layers: intuition, simple example, technical explanation, then a short quiz. Do not continue until I answer the checkpoint. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "For unfamiliar subjects, teach in four layers: intuition, simple example, technical explanation, then a short quiz.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "Do not continue until I answer the checkpoint.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer directly quotes the instructions provided in the evidence [S1] for learning unfamiliar subjects. The expected answer requires teaching in four layers (intuition, simple example, technical explanation, short quiz) and stopping until a checkpoint is answered. Both are fully met by the actual answer.",
+      "usage": {
+        "answer_prompt_tokens": 963,
+        "answer_completion_tokens": 649,
+        "grader_prompt_tokens": 1177,
+        "grader_completion_tokens": 216,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1229.5607920968905,
+        "generation": 19033.589540980756,
+        "grader": 14421.943166,
+        "total": 34685.093499077644
+      }
+    },
+    {
+      "id": "failed-recovery",
+      "question": "Where does a batch go once all recovery attempts fail?",
+      "answerable": true,
+      "expected_answer": "After the third failed attempt, the batch is moved to the settlement dead-letter queue.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "settlement-runbook.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The available documents indicate that after all recovery attempts fail, a batch is moved to the settlement dead-letter queue. This is explicitly stated in [S1]: \"Failed settlement batches are retried up to three times. After the third failed attempt, the batch is moved to the settlement dead-letter queue.\"",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "After all recovery attempts fail, a batch is moved to the settlement dead-letter queue.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer correctly states that after all recovery attempts fail, the batch moves to the settlement dead-letter queue. The evidence [S1] explicitly supports this claim: \"After the third failed attempt, the batch is moved to the settlement dead-letter queue.\" This matches the expected answer exactly.",
+      "usage": {
+        "answer_prompt_tokens": 404,
+        "answer_completion_tokens": 541,
+        "grader_prompt_tokens": 556,
+        "grader_completion_tokens": 172,
+        "context_tokens": 132,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1251.3681249693036,
+        "generation": 14953.237292007543,
+        "grader": 11864.724292,
+        "total": 28069.329708976846
+      }
+    },
+    {
+      "id": "study-with-ai",
+      "question": "How can I get an AI to help me study without rushing ahead?",
+      "answerable": true,
+      "expected_answer": "Teach in four layers and wait for the checkpoint answer",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "To get an AI to help you study without rushing ahead, use the \"Learning Prompt\" approach which teaches in four layers: intuition, simple example, technical explanation, then a short quiz. This approach requires you to answer checkpoints before continuing, which helps prevent rushing ahead. [S2]",
+      "citations": [
+        {
+          "source_id": "S2",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "Use the \"Learning Prompt\" approach to help study without rushing ahead.",
+          "cited_source_ids": [
+            "S2"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The \"Learning Prompt\" teaches in four layers: intuition, simple example, technical explanation, and a short quiz.",
+          "cited_source_ids": [
+            "S2"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "This approach requires answering checkpoints before continuing to prevent rushing ahead.",
+          "cited_source_ids": [
+            "S2"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer is 'Teach in four layers and wait for the checkpoint answer'. The actual answer states that using the \"Learning Prompt\" approach teaches in four layers (intuition, simple example, technical explanation, then a short quiz) and requires answering checkpoints before continuing. This fully covers all necessary details from the expected answer while providing context from the evidence [S2]. Therefore, it is correct and complete.",
+      "usage": {
+        "answer_prompt_tokens": 969,
+        "answer_completion_tokens": 1612,
+        "grader_prompt_tokens": 1189,
+        "grader_completion_tokens": 291,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1229.5116250170395,
+        "generation": 41806.57433299348,
+        "grader": 16687.115875,
+        "total": 59723.20183301052
+      }
+    },
+    {
+      "id": "approve-settlement-batch",
+      "question": "Who must approve replaying a settlement batch",
+      "answerable": false,
+      "expected_answer": "The available documents do not contain enough information.",
+      "expected_behavior": "abstain",
+      "relevant_documents": [],
+      "relevant_pages": [],
+      "actual_answer": "The available documents do not contain enough information.",
+      "citations": [],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The available documents do not contain enough information regarding who must approve replaying a settlement batch.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer states that the documents lack sufficient information. The actual answer mirrors this statement. Evidence [S1] mentions that an operator must investigate a failure before replaying a batch, but it does not specify *who* must approve the replay, thus supporting the conclusion that the required information is missing.",
+      "usage": {
+        "answer_prompt_tokens": 402,
+        "answer_completion_tokens": 1372,
+        "grader_prompt_tokens": 492,
+        "grader_completion_tokens": 174,
+        "context_tokens": 132,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1209.9108330439776,
+        "generation": 35559.82433294412,
+        "grader": 13995.859834,
+        "total": 50765.5949999881
+      }
+    },
+    {
+      "id": "privacy-before-sharing",
+      "question": "What should I check before pasting sensitive material into an AI tool?",
+      "answerable": true,
+      "expected_answer": "Check for secrets, personal identifiers and confidential information, and redact them before sharing.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "According to the Privacy Check section in the AI Command Guide, you should check if the material contains passwords, API keys, personal identifiers, confidential company data, medical details, financial account data, or information you do not have permission to share. You should redact this information first before pasting into an AI tool [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "You should check if the material contains passwords, API keys, personal identifiers, confidential company data, medical details, financial account data, or information you do not have permission to share.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "You should redact this information first before pasting into an AI tool.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer advises checking for secrets, personal identifiers, and confidential information and redacting them. The actual answer cites the 'Privacy Check' section in [S1], which explicitly lists: 'passwords, API keys, personal identifiers, confidential company data, medical details, financial account data, or information I do not have permission to share?' and instructs to 'Redact first.' This fully covers all required elements from the expected answer and provides specific detail from the evidence.",
+      "usage": {
+        "answer_prompt_tokens": 969,
+        "answer_completion_tokens": 613,
+        "grader_prompt_tokens": 1200,
+        "grader_completion_tokens": 253,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1272.107166936621,
+        "generation": 17991.370542091317,
+        "grader": 16436.412125,
+        "total": 35699.88983402794
+      }
+    },
+    {
+      "id": "code-review-criteria",
+      "question": "Which issues should an AI look for when reviewing code?",
+      "answerable": true,
+      "expected_answer": "Review correctness, edge cases, complexity, security, concurrency, failure recovery, observability, maintainability and tests; rank findings by severity.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        3
+      ],
+      "actual_answer": "An AI should look for correctness, edge cases, complexity, security, concurrency, failure recovery, observability, maintainability and tests when reviewing code [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 3
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 3,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "An AI should look for correctness, edge cases, complexity, security, concurrency, failure recovery, observability, maintainability and tests when reviewing code.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists: 'Review correctness, edge cases, complexity, security, concurrency, failure recovery, observability, maintainability and tests; rank findings by severity.'\n\nThe actual answer states: 'An AI should look for correctness, edge cases, complexity, security, concurrency, failure recovery, observability, maintainability and tests when reviewing code [S1].'\n\nComparison:\n1. **Correctness:** Present in both.\n2. **Edge cases:** Present in both.\n3. **Complexity:** Present in both.\n4. **Security:** Present in both.\n5. **Concurrency:** Present in both.\n6. **Failure recovery:** Present in both.\n7. **Observability:** Present in both.\n8. **Maintainability:** Present in both.\n9. **Tests:** Present in both.\n10. **Rank findings by severity:** This crucial instruction from the expected answer is missing from the actual answer.\n\nTherefore, the answer is factually correct but incomplete because it omits the required step to 'rank findings by severity.' The evidence supports all listed items, and the omission of one key part of the instructions leads to a score of 3 for completeness.",
+      "usage": {
+        "answer_prompt_tokens": 966,
+        "answer_completion_tokens": 693,
+        "grader_prompt_tokens": 1177,
+        "grader_completion_tokens": 376,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1309.8523340886459,
+        "generation": 20394.56887508277,
+        "grader": 19918.737833,
+        "total": 41623.15904217141
+      }
+    },
+    {
+      "id": "goal-to-plan",
+      "question": "How should I turn a goal into an actionable plan?",
+      "answerable": true,
+      "expected_answer": "Break the goal into milestones, next actions, dependencies, risks and a realistic timeline, starting with the smallest useful next step.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        4
+      ],
+      "actual_answer": "To turn a goal into an actionable plan, you should turn this goal into milestones, next actions, dependencies, risks and a realistic timeline. Start with the smallest useful next step [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 4
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "To turn a goal into an actionable plan, you should turn this goal into milestones, next actions, dependencies, risks and a realistic timeline.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "You must start with the smallest useful next step.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer requires breaking a goal into milestones, next actions, dependencies, risks, and a realistic timeline, starting with the smallest useful next step. The actual answer states: \"To turn a goal into an actionable plan, you should turn this goal into milestones, next actions, dependencies, risks and a realistic timeline. Start with the smallest useful next step [S1].\" This directly matches all components of the expected answer using evidence from [S1].",
+      "usage": {
+        "answer_prompt_tokens": 877,
+        "answer_completion_tokens": 550,
+        "grader_prompt_tokens": 1086,
+        "grader_completion_tokens": 222,
+        "context_tokens": 603,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1281.7905000410974,
+        "generation": 15797.266042092815,
+        "grader": 14706.667084,
+        "total": 31785.723626133913
+      }
+    },
+    {
+      "id": "privacy-redaction-tool",
+      "question": "Which software must I use to redact sensitive information before sharing it?",
+      "answerable": false,
+      "expected_answer": "The available documents do not contain enough information.",
+      "expected_behavior": "abstain",
+      "relevant_documents": [],
+      "relevant_pages": [],
+      "actual_answer": "The available documents do not contain enough information.",
+      "citations": [],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 0.5
+      },
+      "claim_assessments": [
+        {
+          "claim": "The available documents do not contain enough information regarding which software to use for redacting sensitive information.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The actual answer correctly states that the available documents lack sufficient information.",
+          "cited_source_ids": [],
+          "supported": false
+        }
+      ],
+      "grader_rationale": "The question asks for a specific software recommendation for redacting sensitive information. The provided evidence (S1, S2, and S3) mentions 'Privacy Check' in [S1] which advises to 'Redact first' if the material might contain sensitive data, but it does not name any specific software tool to use for this redaction process. Both the expected answer and the actual answer state that the available documents do not contain enough information, which accurately reflects the evidence provided.",
+      "usage": {
+        "answer_prompt_tokens": 784,
+        "answer_completion_tokens": 567,
+        "grader_prompt_tokens": 908,
+        "grader_completion_tokens": 218,
+        "context_tokens": 508,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1233.0358749022707,
+        "generation": 16296.925417031161,
+        "grader": 16518.217417,
+        "total": 34048.17870893343
+      }
+    },
+    {
+      "id": "sev1-payment-response-multi-document",
+      "question": "Which team owns a severity-one payments incident, and what should responders do first?",
+      "answerable": true,
+      "expected_answer": "The Mercury team owns the payments platform. Responders should page the primary on-call responder, open an incident channel, and preserve transaction logs before restarting services.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "service-ownership.md",
+        "payment-incident-runbook.md"
+      ],
+      "relevant_pages": [
+        null,
+        null
+      ],
+      "actual_answer": "The Mercury team owns a severity-one payments incident [S2], and responders should first page the primary on-call responder [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "section": "Severity-one payment incident"
+        },
+        {
+          "source_id": "S2",
+          "document": "service-ownership.md",
+          "page": null,
+          "section": "Payments platform"
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 2,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The Mercury team owns a severity-one payments incident.",
+          "cited_source_ids": [
+            "S2"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "Responders should first page the primary on-call responder.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer requires three actions for responders: 1) page the primary on-call responder, 2) open an incident channel, and 3) preserve transaction logs before restarting services. The actual answer correctly identifies the owning team (Mercury team) and the first step (page the primary on-call responder). However, it omits two required steps from the expected answer: opening an incident channel and preserving transaction logs before restarting services. Therefore, while factually correct based on the evidence provided for the claims made, it is incomplete relative to the full expectation.",
+      "usage": {
+        "answer_prompt_tokens": 430,
+        "answer_completion_tokens": 1333,
+        "grader_prompt_tokens": 567,
+        "grader_completion_tokens": 265,
+        "context_tokens": 153,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1390.7844159984961,
+        "generation": 34208.51495908573,
+        "grader": 15874.246,
+        "total": 51473.54537508423
+      }
+    },
+    {
+      "id": "current-payment-retry-version",
+      "question": "Under the current payment retry policy, how many retries are allowed and how long is the delay?",
+      "answerable": true,
+      "expected_answer": "Up to two retries are allowed, with at least 30 seconds between attempts.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "payment-retry-policy-v2.md"
+      ],
+      "relevant_pages": [
+        null
+      ],
+      "actual_answer": "Under the current payment retry policy, payment submissions may be retried up to two times with at least 30 seconds between attempts [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "section": "Payment retry policy"
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "Payment submissions may be retried up to two times.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "There must be at least 30 seconds between attempts.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer states that payment submissions can be retried up to two times with at least 30 seconds between attempts. The expected answer requires stating 'Up to two retries are allowed' and 'at least 30 seconds between attempts.' Both pieces of information are present in the actual answer, which is directly supported by [S1]. Therefore, all required details are covered accurately.",
+      "usage": {
+        "answer_prompt_tokens": 468,
+        "answer_completion_tokens": 1257,
+        "grader_prompt_tokens": 596,
+        "grader_completion_tokens": 229,
+        "context_tokens": 187,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1390.3519170125946,
+        "generation": 31908.659791923128,
+        "grader": 15361.019,
+        "total": 48660.03070893572
+      }
+    },
+    {
+      "id": "prompt-role-component",
+      "question": "Which part of the six-part prompt formula specifies the perspective the AI should adopt?",
+      "answerable": true,
+      "expected_answer": "ROLE specifies the perspective the AI should adopt.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "ROLE [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 2,
+        "completeness": 1,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "ROLE specifies the perspective the AI should adopt.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer is 'ROLE specifies the perspective the AI should adopt.' The actual answer provided is 'ROLE [S1]'. While the core concept (that ROLE specifies the perspective) is correct and supported by S1, the inclusion of '[S1]' makes the actual answer factually incorrect as a standalone response to the question. Therefore, correctness is marked as 2/4 because it captures the right information but includes extraneous citation markers.",
+      "usage": {
+        "answer_prompt_tokens": 971,
+        "answer_completion_tokens": 710,
+        "grader_prompt_tokens": 1137,
+        "grader_completion_tokens": 167,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1613.9465840533376,
+        "generation": 20994.993958971463,
+        "grader": 17144.156625,
+        "total": 39753.097168024804
+      }
+    },
+    {
+      "id": "weak-answer-iteration",
+      "question": "Should I restart immediately when an AI gives me a weak answer?",
+      "answerable": true,
+      "expected_answer": "No. Iterate on the existing answer instead of restarting immediately.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "No, you should not restart immediately when an AI gives you a weak answer. Instead, you should iterate using the specific techniques listed in the evidence. [S1] explicitly states: \"Do not restart immediately. Iterate.\"",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "You should not restart immediately when an AI gives you a weak answer.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "Instead, you should iterate using specific techniques.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer advises iterating instead of restarting immediately. The actual answer correctly states this advice and cites [S1] which explicitly contains the instruction: \"Do not restart immediately. Iterate.\" Both parts of the required information are present and accurately supported by the evidence.",
+      "usage": {
+        "answer_prompt_tokens": 968,
+        "answer_completion_tokens": 450,
+        "grader_prompt_tokens": 1177,
+        "grader_completion_tokens": 161,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1585.9396669548005,
+        "generation": 15091.911625000648,
+        "grader": 16391.068541,
+        "total": 33068.91983295545
+      }
+    },
+    {
+      "id": "accuracy-check-categories",
+      "question": "What categories should an accuracy check separate?",
+      "answerable": true,
+      "expected_answer": "Verified facts, assumptions, estimates, and unknowns.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The available documents indicate that an accuracy check should separate verified facts, assumptions, estimates, and unknowns. This is explicitly stated in [S3]: \"Separate verified facts, assumptions, estimates, and unknowns.\"",
+      "citations": [
+        {
+          "source_id": "S3",
+          "document": "sample.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "An accuracy check should separate verified facts, assumptions, estimates, and unknowns.",
+          "cited_source_ids": [
+            "S3"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists four categories: verified facts, assumptions, estimates, and unknowns. The actual answer correctly identifies these categories and cites [S3] as the source for this information. All required details are present and supported by the evidence.",
+      "usage": {
+        "answer_prompt_tokens": 643,
+        "answer_completion_tokens": 565,
+        "grader_prompt_tokens": 822,
+        "grader_completion_tokens": 133,
+        "context_tokens": 373,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1369.306500069797,
+        "generation": 17067.55529192742,
+        "grader": 13552.175834,
+        "total": 31989.037625997218
+      }
+    },
+    {
+      "id": "writing-upgrade-guidance",
+      "question": "How should an AI improve writing while preserving the author?",
+      "answerable": true,
+      "expected_answer": "Preserve meaning and voice, improve clarity and flow, remove filler and jargon, and use active voice.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "According to the evidence, an AI should improve writing while preserving the author by \"Preserve my meaning and voice. Improve clarity and flow. Remove filler and jargon. Use active voice. Give me a concise final version.\" [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "An AI should improve writing while preserving the author by instructing it to \"Preserve my meaning and voice. Improve clarity and flow. Remove filler and jargon. Use active voice. Give me a concise final version.\" [S1]",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists four specific actions: preserve meaning and voice, improve clarity and flow, remove filler and jargon, and use active voice. The actual answer quotes the exact instructions found in [S1] which encompasses all these points: \"Preserve my meaning and voice. Improve clarity and flow. Remove filler and jargon. Use active voice.\" It also includes the additional instruction to \"Give me a concise final version,\" which is part of the source text but aligns with the goal of improvement.\n\n**Correctness:** The actual answer accurately reflects the required steps listed in the evidence, matching all key components of the expected answer.\n**Completeness:** All required details (preserve meaning and voice, improve clarity and flow, remove filler and jargon, use active voice) are present in the actual answer, sourced directly from the evidence.\n**Faithfulness:** Every claim made is a direct quote or paraphrase of the provided source material [S1].\n**Relevance:** The answer directly addresses how an AI should improve writing while preserving the author.",
+      "usage": {
+        "answer_prompt_tokens": 966,
+        "answer_completion_tokens": 613,
+        "grader_prompt_tokens": 1186,
+        "grader_completion_tokens": 325,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1315.7315829303116,
+        "generation": 18014.359583961777,
+        "grader": 17972.779209,
+        "total": 37302.87037589209
+      }
+    },
+    {
+      "id": "decision-comparison-criteria",
+      "question": "Which criteria should be used to compare decision options?",
+      "answerable": true,
+      "expected_answer": "Cost, risk, time, upside, reversibility, and likelihood of success.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "The available evidence states that decision options should be compared using cost, risk, time, upside, reversibility and likelihood of success [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "Decision options should be compared using cost, risk, time, upside, reversibility and likelihood of success.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists the criteria: Cost, risk, time, upside, reversibility, and likelihood of success. The actual answer states that decision options should be compared using 'cost, risk, time, upside, reversibility and likelihood of success' [S1]. This matches all required details from the expected answer and is directly supported by the evidence.",
+      "usage": {
+        "answer_prompt_tokens": 751,
+        "answer_completion_tokens": 369,
+        "grader_prompt_tokens": 901,
+        "grader_completion_tokens": 160,
+        "context_tokens": 479,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1309.3498749658465,
+        "generation": 11894.663624931127,
+        "grader": 13385.644583,
+        "total": 26589.658082896975
+      }
+    },
+    {
+      "id": "research-source-priority",
+      "question": "What sources should be prioritized for current evidence-sensitive research?",
+      "answerable": true,
+      "expected_answer": "Current credible sources, prioritizing primary and official sources.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "For current evidence-sensitive research, primary/official sources should be prioritized, as stated in [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "For current evidence-sensitive research, primary/official sources should be prioritized.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer is 'Current credible sources, prioritizing primary and official sources.' The actual answer states, 'For current evidence-sensitive research, primary/official sources should be prioritized, as stated in [S1].' This directly reflects the instruction found in [S1] under 'Research Prompt': 'Research this using current credible sources. Prioritize primary/official sources.' Therefore, both the content and the citation are accurate.",
+      "usage": {
+        "answer_prompt_tokens": 753,
+        "answer_completion_tokens": 555,
+        "grader_prompt_tokens": 890,
+        "grader_completion_tokens": 171,
+        "context_tokens": 479,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1262.1019169455394,
+        "generation": 16651.931916945614,
+        "grader": 13492.197958,
+        "total": 31406.231791891154
+      }
+    },
+    {
+      "id": "privacy-sensitive-categories",
+      "question": "Name the sensitive-data categories listed in the privacy check.",
+      "answerable": true,
+      "expected_answer": "Passwords, API keys, personal identifiers, confidential company data, medical details, financial account data, and information the user lacks permission to share.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        2
+      ],
+      "actual_answer": "The sensitive-data categories listed in the privacy check are passwords, API keys, personal identifiers, confidential company data, medical details, financial account data, and information I do not have permission to share [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 2
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The sensitive-data categories listed in the privacy check are passwords, API keys, personal identifiers, confidential company data, medical details, financial account data, and information I do not have permission to share.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists seven categories. The actual answer lists the same seven categories and cites [S1]. The evidence in [S1] explicitly lists these exact categories under 'Privacy Check'. Therefore, the answer is fully correct and complete based on the provided evidence.",
+      "usage": {
+        "answer_prompt_tokens": 752,
+        "answer_completion_tokens": 1228,
+        "grader_prompt_tokens": 929,
+        "grader_completion_tokens": 187,
+        "context_tokens": 479,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1588.034583022818,
+        "generation": 32087.990875006653,
+        "grader": 13403.754458,
+        "total": 47079.77991602947
+      }
+    },
+    {
+      "id": "direct-answer-style",
+      "question": "What response order does the direct-answer prompt request?",
+      "answerable": true,
+      "expected_answer": "Give the direct answer first, then explain only what is needed to understand the recommendation.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        3
+      ],
+      "actual_answer": "The direct-answer prompt requests that the AI give the direct answer first, followed by an explanation of only what is necessary to understand the recommendation. [S2]",
+      "citations": [
+        {
+          "source_id": "S2",
+          "document": "sample.pdf",
+          "page": 3
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The direct-answer prompt requests that the AI give the direct answer first.",
+          "cited_source_ids": [
+            "S2"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "It also requires explaining only what is necessary to understand the recommendation.",
+          "cited_source_ids": [
+            "S2"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer asks for the response order requested by the direct-answer prompt. The actual answer correctly states that the AI should give the direct answer first and then explain only what is needed to understand the recommendation. This information is directly supported by [S2], which details '1. Direct answer' as: 'Give me the direct answer first. Explain only what I need to understand the recommendation.'",
+      "usage": {
+        "answer_prompt_tokens": 965,
+        "answer_completion_tokens": 985,
+        "grader_prompt_tokens": 1167,
+        "grader_completion_tokens": 194,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1222.0639580627903,
+        "generation": 26946.135749923997,
+        "grader": 14882.201042,
+        "total": 43050.40074998679
+      }
+    },
+    {
+      "id": "improve-prompt-components",
+      "question": "Which elements should be added when strengthening a prompt?",
+      "answerable": true,
+      "expected_answer": "Goal, context, constraints, output format, and quality criteria.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        3
+      ],
+      "actual_answer": "The elements that should be added when strengthening a prompt are: goal, context, constraints, output format, and quality criteria [S2].",
+      "citations": [
+        {
+          "source_id": "S2",
+          "document": "sample.pdf",
+          "page": 3
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The elements that should be added when strengthening a prompt are: goal, context, constraints, output format, and quality criteria.",
+          "cited_source_ids": [
+            "S2"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists 'Goal, context, constraints, output format, and quality criteria.' The actual answer states these exact elements. Source [S2] explicitly mentions rewriting a request into a stronger prompt with 'goal, context, constraints, output format and quality criteria,' which fully supports the claim.",
+      "usage": {
+        "answer_prompt_tokens": 965,
+        "answer_completion_tokens": 2803,
+        "grader_prompt_tokens": 1158,
+        "grader_completion_tokens": 154,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1285.9709589974955,
+        "generation": 72950.2867909614,
+        "grader": 17334.470375,
+        "total": 91570.7281249589
+      }
+    },
+    {
+      "id": "summary-required-elements",
+      "question": "What elements are requested by the summarization prompt?",
+      "answerable": true,
+      "expected_answer": "A one-sentence summary, five key points, important numbers, decisions, action items, and unresolved questions.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        3
+      ],
+      "actual_answer": "The summarization prompt requests the following elements: a one-sentence summary, five key points, important numbers, decisions, action items, and unresolved questions. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 3
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The summarization prompt requests a one-sentence summary.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The summarization prompt requests five key points.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The summarization prompt requests important numbers.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The summarization prompt requests decisions.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The summarization prompt requests action items.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The summarization prompt requests unresolved questions.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists six specific elements: a one-sentence summary, five key points, important numbers, decisions, action items, and unresolved questions. The actual answer states that the summarization prompt requests exactly these elements, citing [S1]. Evidence [S1] explicitly details this list under '5. Summarize'. All required elements are present in the actual answer and fully supported by the evidence.",
+      "usage": {
+        "answer_prompt_tokens": 965,
+        "answer_completion_tokens": 1284,
+        "grader_prompt_tokens": 1173,
+        "grader_completion_tokens": 391,
+        "context_tokens": 693,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1272.393708000891,
+        "generation": 38359.77466602344,
+        "grader": 22138.218875,
+        "total": 61770.38724902433
+      }
+    },
+    {
+      "id": "document-analysis-fields",
+      "question": "What should document analysis extract explicitly?",
+      "answerable": true,
+      "expected_answer": "Obligations, deadlines, amounts, exceptions, and risks, while separating explicit statements from inference.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        3
+      ],
+      "actual_answer": "Document analysis should extract obligations, deadlines, amounts, exceptions, and risks [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 3
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 3,
+        "completeness": 2,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 0.5
+      },
+      "claim_assessments": [
+        {
+          "claim": "Document analysis should extract obligations, deadlines, amounts, exceptions, and risks.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "It should also separate explicit statements from inference.",
+          "cited_source_ids": [],
+          "supported": false
+        }
+      ],
+      "grader_rationale": "The expected answer requires mentioning the separation of explicit statements from inference. The actual answer only lists the items to be extracted (obligations, deadlines, amounts, exceptions, and risks) but omits the crucial part about separating explicit statements from inference. Therefore, it is factually correct based on the evidence provided in [S1] for the listed items, but incomplete compared to the expected answer.",
+      "usage": {
+        "answer_prompt_tokens": 824,
+        "answer_completion_tokens": 1909,
+        "grader_prompt_tokens": 999,
+        "grader_completion_tokens": 192,
+        "context_tokens": 555,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1977.0099999150261,
+        "generation": 48861.73291702289,
+        "grader": 17008.760125,
+        "total": 67847.50304193792
+      }
+    },
+    {
+      "id": "self-check-items",
+      "question": "What should the self-check inspect before finalizing?",
+      "answerable": true,
+      "expected_answer": "Contradictions, unsupported claims, missing constraints, and places where uncertainty should be stated.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "sample.pdf"
+      ],
+      "relevant_pages": [
+        4
+      ],
+      "actual_answer": "The self-check should inspect for contradictions, unsupported claims, missing constraints and places where uncertainty should be stated [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "sample.pdf",
+          "page": 4
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The self-check should inspect for contradictions.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The self-check should inspect for unsupported claims.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The self-check should inspect for missing constraints.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The self-check should inspect for places where uncertainty should be stated.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer lists four items: contradictions, unsupported claims, missing constraints, and places where uncertainty should be stated. The actual answer states: \"The self-check should inspect for contradictions, unsupported claims, missing constraints and places where uncertainty should be stated [S1].\". All required details are present and accurately reflected in the evidence [S1].",
+      "usage": {
+        "answer_prompt_tokens": 662,
+        "answer_completion_tokens": 535,
+        "grader_prompt_tokens": 802,
+        "grader_completion_tokens": 306,
+        "context_tokens": 389,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1967.9540420183912,
+        "generation": 16148.763458011672,
+        "grader": 18181.157459,
+        "total": 36297.87495903006
+      }
+    },
+    {
+      "id": "settlement-recovery-owner",
+      "question": "Which team owns settlement recovery?",
+      "answerable": true,
+      "expected_answer": "The settlement operations team.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "dedup_test.pdf"
+      ],
+      "relevant_pages": [
+        1
+      ],
+      "actual_answer": "The settlement operations team owns settlement recovery [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "dedup_test.pdf",
+          "page": 1
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The settlement operations team owns settlement recovery.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer directly and correctly answers the question using information from the evidence. The expected answer is 'The settlement operations team.', and the actual answer states this fact while citing the source [S1], which confirms that 'the recovery owner is the settlement operations team.' Therefore, all dimensions are fully met.",
+      "usage": {
+        "answer_prompt_tokens": 391,
+        "answer_completion_tokens": 661,
+        "grader_prompt_tokens": 479,
+        "grader_completion_tokens": 163,
+        "context_tokens": 124,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 2253.3191250404343,
+        "generation": 19208.591708913445,
+        "grader": 13966.254334,
+        "total": 35428.16516795388
+      }
+    },
+    {
+      "id": "sev1-first-actions",
+      "question": "List the first actions for a severity-one payments incident.",
+      "answerable": true,
+      "expected_answer": "Page the primary on-call responder, open an incident channel, and preserve transaction logs before restarting services.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "payment-incident-runbook.md"
+      ],
+      "relevant_pages": [
+        null
+      ],
+      "actual_answer": "The first actions for a severity-one payments incident are: page the primary on-call responder, open an incident channel, and preserve transaction logs before restarting services. [S1]",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "section": "Severity-one payment incident"
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The first actions for a severity-one payments incident are: page the primary on-call responder.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The first actions for a severity-one payments incident include opening an incident channel.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        },
+        {
+          "claim": "The first actions for a severity-one payments incident involve preserving transaction logs before restarting services.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer directly lists the three required steps: page the primary on-call responder, open an incident channel, and preserve transaction logs before restarting services. All these points are explicitly stated in the evidence [S1]. The structure of the answer matches the expected answer exactly.",
+      "usage": {
+        "answer_prompt_tokens": 432,
+        "answer_completion_tokens": 864,
+        "grader_prompt_tokens": 567,
+        "grader_completion_tokens": 269,
+        "context_tokens": 160,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1534.6130420221016,
+        "generation": 23958.095416077413,
+        "grader": 19375.937708,
+        "total": 44868.64616609951
+      }
+    },
+    {
+      "id": "incident-commander-role",
+      "question": "What does the incident commander do during a payment incident?",
+      "answerable": true,
+      "expected_answer": "Coordinates the response and records unresolved conflicts.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "payment-incident-runbook.md"
+      ],
+      "relevant_pages": [
+        null
+      ],
+      "actual_answer": "The incident commander coordinates the response and records unresolved conflicts [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "section": "Severity-one payment incident"
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The incident commander coordinates the response and records unresolved conflicts.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer directly quotes a statement from the evidence [S1], which states: 'The incident commander coordinates the response and records unresolved conflicts.' This matches the expected answer exactly. All dimensions are fully met.",
+      "usage": {
+        "answer_prompt_tokens": 452,
+        "answer_completion_tokens": 1529,
+        "grader_prompt_tokens": 552,
+        "grader_completion_tokens": 147,
+        "context_tokens": 179,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1536.97974991519,
+        "generation": 42830.023167072795,
+        "grader": 15229.194083,
+        "total": 59596.19699998799
+      }
+    },
+    {
+      "id": "incident-recovery-validation",
+      "question": "What must be checked before declaring payment recovery complete?",
+      "answerable": true,
+      "expected_answer": "Settlement totals must be validated.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "payment-incident-runbook.md"
+      ],
+      "relevant_pages": [
+        null
+      ],
+      "actual_answer": "The available evidence indicates that \"Validate settlement totals\" must be checked before declaring recovery complete [S1]. This is explicitly stated in the Recovery section of the payment-incident-runbook.md document.",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "section": "Recovery"
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "Validate settlement totals must be checked before declaring recovery complete.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer requires stating that 'Settlement totals must be validated.' The actual answer states, \"Validate settlement totals\" must be checked before declaring recovery complete [S1]. This is explicitly stated in the Recovery section of the payment-incident-runbook.md document. The evidence [S1] directly supports this claim: \"Validate settlement totals before declaring recovery complete.\" Therefore, the answer is fully correct and complete.",
+      "usage": {
+        "answer_prompt_tokens": 404,
+        "answer_completion_tokens": 535,
+        "grader_prompt_tokens": 526,
+        "grader_completion_tokens": 190,
+        "context_tokens": 133,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1287.3041670536622,
+        "generation": 15526.393000036478,
+        "grader": 14786.648417,
+        "total": 31600.34558409014
+      }
+    },
+    {
+      "id": "payments-platform-owner",
+      "question": "Which team owns the payments platform?",
+      "answerable": true,
+      "expected_answer": "The Mercury team.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "service-ownership.md"
+      ],
+      "relevant_pages": [
+        null
+      ],
+      "actual_answer": "The Mercury team owns the payments platform [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "service-ownership.md",
+          "page": null,
+          "section": "Payments platform"
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The Mercury team owns the payments platform.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer correctly identifies that 'The Mercury team' owns the payments platform, which is directly supported by [S1].",
+      "usage": {
+        "answer_prompt_tokens": 421,
+        "answer_completion_tokens": 395,
+        "grader_prompt_tokens": 509,
+        "grader_completion_tokens": 127,
+        "context_tokens": 153,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 2600.312541006133,
+        "generation": 12691.207958967425,
+        "grader": 22220.306125,
+        "total": 37511.82662497356
+      }
+    },
+    {
+      "id": "current-retry-count-paraphrase",
+      "question": "How many payment submission retries does the active policy permit?",
+      "answerable": true,
+      "expected_answer": "Up to two retries.",
+      "expected_behavior": "answer",
+      "relevant_documents": [
+        "payment-retry-policy-v2.md"
+      ],
+      "relevant_pages": [
+        null
+      ],
+      "actual_answer": "The available documents indicate that the active policy permits up to two payment submission retries. This is explicitly stated in [S1]: \"Payment submissions may be retried up to two times, with at least 30 seconds between attempts. This is the current version 2 policy.\" \n\n[S2] discusses settlement batches (not payment submissions) and permits up to three retries, but this is not relevant to the question about payment submission retries. [S3] does not provide information about payment submission retry limits.\n\nTherefore, the answer is 2 [S1].",
+      "citations": [
+        {
+          "source_id": "S1",
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "section": "Payment retry policy"
+        },
+        {
+          "source_id": "S2",
+          "document": "settlement-runbook.pdf",
+          "page": 1
+        },
+        {
+          "source_id": "S3",
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "section": "Severity-one payment incident"
+        }
+      ],
+      "abstention_matches": true,
+      "citation_sources_match": false,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The active policy permits up to two payment submission retries.",
+          "cited_source_ids": [
+            "S1"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer is 'Up to two retries.' The actual answer correctly identifies this limit by citing [S1], which states: \"Payment submissions may be retried up to two times... This is the current version 2 policy.\" It also correctly dismisses irrelevant information from [S2] and [S3]. All required details are present, and the factual claim is directly supported.",
+      "usage": {
+        "answer_prompt_tokens": 460,
+        "answer_completion_tokens": 1094,
+        "grader_prompt_tokens": 669,
+        "grader_completion_tokens": 185,
+        "context_tokens": 187,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 2074.404832907021,
+        "generation": 29102.741207927465,
+        "grader": 16035.265916,
+        "total": 47212.41195683449
+      }
+    },
+    {
+      "id": "unsupported-customer-notification",
+      "question": "Which customers must be notified during a severity-one payment incident?",
+      "answerable": false,
+      "expected_answer": "The available documents do not contain enough information.",
+      "expected_behavior": "abstain",
+      "relevant_documents": [],
+      "relevant_pages": [],
+      "actual_answer": "The available documents do not contain enough information.",
+      "citations": [],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The available documents do not contain enough information regarding which customers must be notified during a severity-one payment incident.",
+          "cited_source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The actual answer exactly matches the expected answer. The evidence provided (S1, S2, S3) details procedures for handling a severity-one payment incident (paging responders, opening channels, preserving logs, recovery steps) but does not mention notifying specific customers.",
+      "usage": {
+        "answer_prompt_tokens": 433,
+        "answer_completion_tokens": 520,
+        "grader_prompt_tokens": 528,
+        "grader_completion_tokens": 177,
+        "context_tokens": 160,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1615.5477500287816,
+        "generation": 15149.448500014842,
+        "grader": 14926.9415,
+        "total": 31691.937750043624
+      }
+    },
+    {
+      "id": "unsupported-dead-letter-retention",
+      "question": "How many days are settlement dead-letter batches retained?",
+      "answerable": false,
+      "expected_answer": "The available documents do not contain enough information.",
+      "expected_behavior": "abstain",
+      "relevant_documents": [],
+      "relevant_pages": [],
+      "actual_answer": "The available documents do not contain enough information.",
+      "citations": [],
+      "abstention_matches": true,
+      "citation_sources_match": true,
+      "scores": {
+        "factual_correctness": 4,
+        "completeness": 4,
+        "faithfulness": 4,
+        "answer_relevance": 4,
+        "claim_citation_support": 1.0
+      },
+      "claim_assessments": [
+        {
+          "claim": "The available documents do not contain enough information regarding how many days settlement dead-letter batches are retained.",
+          "cited_source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ],
+          "supported": true
+        }
+      ],
+      "grader_rationale": "The expected answer states that the documents lack sufficient information. The actual answer mirrors this statement. Reviewing the evidence (S1, S2, S3), none of them specify a retention period in days for settlement dead-letter batches; they only mention moving failed batches to the queue after three retries [S1]. Therefore, stating that the information is unavailable is correct and complete based on the provided context.",
+      "usage": {
+        "answer_prompt_tokens": 403,
+        "answer_completion_tokens": 457,
+        "grader_prompt_tokens": 494,
+        "grader_completion_tokens": 205,
+        "context_tokens": 132,
+        "estimated_cost_usd": 0.0,
+        "pricing_basis": "local models; no per-token API charge"
+      },
+      "latency_ms": {
+        "retrieval": 1737.7780840033665,
+        "generation": 13899.644666002132,
+        "grader": 21399.584709,
+        "total": 37037.0074590055
+      }
+    }
+  ]
+}

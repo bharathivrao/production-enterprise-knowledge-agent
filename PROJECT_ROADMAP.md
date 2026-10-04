@@ -1,6 +1,6 @@
 # Production Enterprise Knowledge Agent — Status and Remaining Roadmap
 
-Updated: October 3, 2026
+Updated: October 4, 2026
 
 ## Purpose and scope
 
@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stages 1 and 2 are complete: the service has reliable multi-format ingestion plus permission-aware vector, PostgreSQL full-text, hybrid, and cross-encoder-reranked retrieval with measured defaults. It is not yet a complete agent or a production-ready enterprise service.
+Current status: Stages 1, 2, and 3 are complete pending owner review. The service has reliable multi-format ingestion, permission-aware retrieval, and versioned evaluation with passing held-out quality gates. It is not yet a complete agent or a production-ready enterprise service.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -57,10 +57,17 @@ Status is based on inspected repository code and recorded evaluation results. Em
 
 ### Evaluation
 
-- Golden dataset with 15 cases: 11 answerable and four unsupported questions.
-- Retrieval runner measures Hit@k and Mean Reciprocal Rank, skips unsupported cases, and saves JSON reports with metadata.
-- Answer runner records expected/actual answers, citations, abstention behavior, and allowed source-page checks.
-- Saved prompt experiments and baseline reports support comparisons.
+- Versioned 50-case golden dataset (35 development, 15 held-out test), with
+  coverage for multi-document, conflicting/versioned, ambiguous, unsupported,
+  and adversarial questions.
+- Retrieval runner reports Hit@k, MRR, Recall@k, context precision, coverage,
+  latency distributions, and dependency failures.
+- Answer runner scores correctness, completeness, faithfulness, relevance,
+  claim-level citation support, answer/abstain/clarify behavior, and citation
+  source accuracy; it captures latency, tokens, and per-case failures.
+- Prompt, grader, dataset/manifest, corpus, models, and retrieval configuration
+  are versioned or hashed in reports. Grader calibration, repeatability reports,
+  explicit acceptance thresholds, and executable gates are included.
 
 ## Recorded results and their limits
 
@@ -125,21 +132,34 @@ higher latency. All variants achieved complete source coverage at `k=3` on the
 
 ### 3. Evaluation and quality measurement
 
-Status: retrieval metrics and basic answer checks implemented.
+Status: completed October 4, 2026; pending owner review.
 
-- [ ] Expand to approximately 50 varied questions initially, and eventually 100+.
-- [ ] Separate development questions from a held-out test set.
-- [ ] Cover multi-document, ambiguous, conflicting, unsupported, and adversarial questions.
-- [ ] Score factual correctness, completeness, faithfulness, answer relevance, and claim-level citation support.
-- [ ] Add Recall@k/context precision where applicable; do not label the current Hit@k metric as Recall@k.
-- [ ] Record latency distributions, token usage, dependency failures, and relevant resource/cost measurements.
-- [ ] Version prompts, datasets, corpus snapshots, model identifiers, and retrieval configuration.
-- [ ] Add repeatability checks and record variation across runs.
-- [ ] Capture per-case exceptions so one failed request does not lose the whole evaluation run.
-- [ ] Define explicit acceptance thresholds and CI regression gates.
-- [ ] Calibrate automated graders against human review if introducing model-based evaluation.
+- [x] Expand to approximately 50 varied questions initially; eventual expansion to 100+ remains a dataset-growth goal.
+- [x] Separate development questions from a held-out test set.
+- [x] Cover multi-document, ambiguous, conflicting, unsupported, and adversarial questions.
+- [x] Score factual correctness, completeness, faithfulness, answer relevance, and claim-level citation support.
+- [x] Add Recall@k/context precision where applicable; do not label the current Hit@k metric as Recall@k.
+- [x] Record latency distributions, token usage, dependency failures, and relevant resource/cost measurements; local hardware/energy costs remain unmeasured.
+- [x] Version prompts, datasets, corpus snapshots, model identifiers, and retrieval configuration.
+- [x] Add repeatability checks and record variation across runs.
+- [x] Capture per-case exceptions so one failed request does not lose the whole evaluation run.
+- [x] Define explicit acceptance thresholds and executable CI regression gates (CI wiring remains Stage 9).
+- [x] Calibrate automated graders against human review when introducing model-based evaluation.
 
-Completion evidence: a reproducible report distinguishes retrieval failures, unsupported answers, incorrect citations, and incomplete answers.
+Completion evidence: 50-case, split-aware reports separate retrieval failures,
+unsupported/ambiguous behavior, citation-source accuracy, claim support, and
+answer quality. Retrieval, answer development, answer held-out, and grader
+calibration gates pass. Five development questions repeated three times had
+1.0 normalized answer and citation agreement. See `docs/evaluation-policy.md`
+and `evals/results/stage3-*.json`.
+
+Evidence: held-out retrieval achieved Hit@3 1.0, MRR@3 0.9091, and Recall@3
+1.0. Held-out answers completed 15/15 cases with zero runner failures;
+correctness, completeness, faithfulness, relevance, claim citation support,
+abstention and citation-source accuracy each scored 1.0 in this small set. The
+eight-label grader calibration achieved MAE 0.46875 and 0.875 within one point.
+These local, small-corpus results are not a general production-quality
+guarantee; automated grades still require human sampling.
 
 ### 4. Goal analysis and planning
 

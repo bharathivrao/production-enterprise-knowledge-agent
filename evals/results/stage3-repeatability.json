@@ -1,0 +1,196 @@
+{
+  "split": "development",
+  "runs_per_case": 3,
+  "case_count": 5,
+  "answer_agreement": 1.0,
+  "citation_agreement": 1.0,
+  "results": [
+    {
+      "id": "settlement-retry-exhausted",
+      "runs": [
+        {
+          "run": 1,
+          "answer": "After settlement retries are exhausted (after three failed attempts), the batch is moved to the settlement dead-letter queue [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "answer": "After settlement retries are exhausted (after three failed attempts), the batch is moved to the settlement dead-letter queue [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "answer": "After settlement retries are exhausted (after three failed attempts), the batch is moved to the settlement dead-letter queue [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        }
+      ],
+      "failures": [],
+      "answer_agreement": 1.0,
+      "citation_agreement": 1.0
+    },
+    {
+      "id": "settlement-replay-wait",
+      "runs": [
+        {
+          "run": 1,
+          "answer": "The available documents do not contain enough information.",
+          "citations": []
+        },
+        {
+          "run": 2,
+          "answer": "The available documents do not contain enough information.",
+          "citations": []
+        },
+        {
+          "run": 3,
+          "answer": "The available documents do not contain enough information.",
+          "citations": []
+        }
+      ],
+      "failures": [],
+      "answer_agreement": 1.0,
+      "citation_agreement": 1.0
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "runs": [
+        {
+          "run": 1,
+          "answer": "The six-part prompt formula is ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "sample.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "answer": "The six-part prompt formula is ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "sample.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "answer": "The six-part prompt formula is ROLE + TASK + CONTEXT + CONSTRAINTS + OUTPUT + CHECK [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "sample.pdf",
+              "page": 1
+            }
+          ]
+        }
+      ],
+      "failures": [],
+      "answer_agreement": 1.0,
+      "citation_agreement": 1.0
+    },
+    {
+      "id": "failed-settlement-batches",
+      "runs": [
+        {
+          "run": 1,
+          "answer": "The available documents indicate that failed settlement batches are retried up to three times. This is explicitly stated in [S1]: \"Failed settlement batches are retried up to three times. After the third failed attempt, the batch is moved to the settlement dead-letter queue.\"",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "answer": "The available documents indicate that failed settlement batches are retried up to three times. This is explicitly stated in [S1]: \"Failed settlement batches are retried up to three times. After the third failed attempt, the batch is moved to the settlement dead-letter queue.\"",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "answer": "The available documents indicate that failed settlement batches are retried up to three times. This is explicitly stated in [S1]: \"Failed settlement batches are retried up to three times. After the third failed attempt, the batch is moved to the settlement dead-letter queue.\"",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        }
+      ],
+      "failures": [],
+      "answer_agreement": 1.0,
+      "citation_agreement": 1.0
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "runs": [
+        {
+          "run": 1,
+          "answer": "The operator must investigate the failure before replaying the batch [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "answer": "The operator must investigate the failure before replaying the batch [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "answer": "The operator must investigate the failure before replaying the batch [S1].",
+          "citations": [
+            {
+              "source_id": "S1",
+              "document": "settlement-runbook.pdf",
+              "page": 1
+            }
+          ]
+        }
+      ],
+      "failures": [],
+      "answer_agreement": 1.0,
+      "citation_agreement": 1.0
+    }
+  ]
+}

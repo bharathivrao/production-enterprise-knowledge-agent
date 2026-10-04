@@ -1,0 +1,849 @@
+{
+  "report_version": "3.0.0",
+  "top_k": 3,
+  "split": "development",
+  "evaluated": 30,
+  "hits": 30,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 5,
+  "cases": [
+    {
+      "id": "settlement-retry-exhausted",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 1474.0468750242144,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.33042089213819237
+        },
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.5298209225917929
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5340614816638036
+        }
+      ]
+    },
+    {
+      "id": "six-part-prompt-formula",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 132.04512500669807,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.42731738930796836
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5465313220386405
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5664808998228412
+        }
+      ]
+    },
+    {
+      "id": "failed-settlement-batches",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 96.67820809409022,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.20721060842897365
+        },
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.42664883852322877
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5336724916588427
+        }
+      ]
+    },
+    {
+      "id": "replaying-a-failed-batch",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 99.6574170421809,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.3666738311415344
+        },
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.5949895268691121
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5963369074758627
+        }
+      ]
+    },
+    {
+      "id": "learn-an-unfamiliar-subject",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 121.37920793611556,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6784069198106448
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7325355847201095
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.7424604892730695
+        }
+      ]
+    },
+    {
+      "id": "failed-recovery",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 99.42491597030312,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.34478439341333744
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.5499632790695546
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5789850730611272
+        }
+      ]
+    },
+    {
+      "id": "study-with-ai",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "latency_ms": 96.39616589993238,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5286421426578496
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5436123673610898
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5510505973040314
+        }
+      ]
+    },
+    {
+      "id": "privacy-before-sharing",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 97.56512509193271,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.48696938856095795
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.4882045998329365
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5408361481125081
+        }
+      ]
+    },
+    {
+      "id": "code-review-criteria",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 96.50429198518395,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.47352433520265025
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5458128370381281
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5737583837613003
+        }
+      ]
+    },
+    {
+      "id": "goal-to-plan",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 99.23525003250688,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.5938475448346909
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.6773981500157389
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.701497202486941
+        }
+      ]
+    },
+    {
+      "id": "sev1-payment-response-multi-document",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.6666666666666666,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 101.59083397593349,
+      "retrieved_sources": [
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.2103749779871945
+        },
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.36824246455683085
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5666122565683033
+        }
+      ]
+    },
+    {
+      "id": "current-payment-retry-version",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 104.93533301632851,
+      "retrieved_sources": [
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.24324142449461494
+        },
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.4797846602620446
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.600190997322914
+        }
+      ]
+    },
+    {
+      "id": "prompt-role-component",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 100.6586659932509,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.3849005561948311
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5026388460065803
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5259221242526916
+        }
+      ]
+    },
+    {
+      "id": "weak-answer-iteration",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 96.44224995281547,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.4955509009628942
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5172085165977478
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5422495129259075
+        }
+      ]
+    },
+    {
+      "id": "accuracy-check-categories",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 3,
+      "reciprocal_rank": 0.3333333333333333,
+      "latency_ms": 93.70391594711691,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.6531974101309337
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6586722549585509
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.6799071979854501
+        }
+      ]
+    },
+    {
+      "id": "writing-upgrade-guidance",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 97.74258302059025,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5387602379154726
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5740367085889895
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5836540905900522
+        }
+      ]
+    },
+    {
+      "id": "decision-comparison-criteria",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 96.87795804347843,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5500087171746022
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6909595500278987
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.7076868203971673
+        }
+      ]
+    },
+    {
+      "id": "research-source-priority",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 111.06174997985363,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6194406560750414
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7173615771862004
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.7178771916214685
+        }
+      ]
+    },
+    {
+      "id": "privacy-sensitive-categories",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 104.93820894043893,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5696544869607267
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6076502373635457
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6480250463478177
+        }
+      ]
+    },
+    {
+      "id": "direct-answer-style",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "latency_ms": 105.78487499151379,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.6027073745800153
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6083619852928969
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6270212900003662
+        }
+      ]
+    },
+    {
+      "id": "improve-prompt-components",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "latency_ms": 97.33208292163908,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5154716652069491
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5572427179072659
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5813798516369306
+        }
+      ]
+    },
+    {
+      "id": "summary-required-elements",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 97.29283396154642,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5598265826702118
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5839283118290708
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5956695276685188
+        }
+      ]
+    },
+    {
+      "id": "document-analysis-fields",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 105.10920803062618,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6346589280800747
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6607855680521069
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.7016095331617453
+        }
+      ]
+    },
+    {
+      "id": "self-check-items",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 111.61216697655618,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.5478779163142284
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6141299626424852
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6637541153284374
+        }
+      ]
+    },
+    {
+      "id": "settlement-recovery-owner",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 100.76991596724838,
+      "retrieved_sources": [
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.43559523118748344
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.5164159094219127
+        },
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.530525745780803
+        }
+      ]
+    },
+    {
+      "id": "sev1-first-actions",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.5,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 108.88020799029619,
+      "retrieved_sources": [
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.18458175429419454
+        },
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.5389317548911513
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.5663022786704492
+        }
+      ]
+    },
+    {
+      "id": "incident-commander-role",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 113.66333393380046,
+      "retrieved_sources": [
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.2923946169731011
+        },
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.4212598047387446
+        },
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.6281990920903839
+        }
+      ]
+    },
+    {
+      "id": "incident-recovery-validation",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.5,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 101.16479196585715,
+      "retrieved_sources": [
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.3849454109386844
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5543429355910727
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.5850370852726163
+        }
+      ]
+    },
+    {
+      "id": "payments-platform-owner",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.5,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 103.27008389867842,
+      "retrieved_sources": [
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.29876304526309383
+        },
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.43285513813985566
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6059266002976511
+        }
+      ]
+    },
+    {
+      "id": "current-retry-count-paraphrase",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 96.65162500459701,
+      "retrieved_sources": [
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.2926619190963904
+        },
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.5206050680804986
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.5752917887171624
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-04T03:58:46.987585+00:00",
+  "retriever": "vector",
+  "embedding_model": "embeddinggemma",
+  "dataset_version": "3.1.0",
+  "dataset_sha256": "6283fe9871e21a02bd225bf83a8aa1d939e59fd158949aa5ade4095f05ea81a8",
+  "corpus_version": "stage2-2026-10-03",
+  "corpus_sha256": "9d189cf8792623ab11821c3494e2696aa1e3d95c4ff96970e10e85e3886b7850",
+  "mrr": 0.9277777777777778,
+  "full_coverage_rate": 1.0,
+  "mean_source_recall": 1.0,
+  "recall_at_k": 1.0,
+  "mean_context_precision": 0.36111111111111105,
+  "failure_count": 0,
+  "failures": [],
+  "success_rate": 1.0,
+  "latency_ms": {
+    "min": 93.70391594711691,
+    "mean": 148.74717355317748,
+    "p50": 100.6586659932509,
+    "p95": 121.37920793611556,
+    "p99": 132.04512500669807,
+    "max": 1474.0468750242144
+  },
+  "retrieval_config": {
+    "reranker_model": null,
+    "candidate_count": null,
+    "top_k": 3
+  }
+}

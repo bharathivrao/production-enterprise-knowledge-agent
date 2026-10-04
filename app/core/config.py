@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     embedding_model: str = "embeddinggemma"
     embedding_dimension: int = Field(default=768, ge=1)
     generation_model: str = "qwen3:4b"
+    evaluation_model: str = "gemma4:e4b"
     reranker_model: str = "cross-encoder/ms-marco-MiniLM-L6-v2"
     reranker_candidate_count: int = Field(default=10, ge=1, le=100)
     reranker_batch_size: int = Field(default=16, ge=1, le=128)

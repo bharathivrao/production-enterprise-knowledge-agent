@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "retrieval": {
+    "hit_rate": {"minimum": 0.90},
+    "mrr": {"minimum": 0.80},
+    "recall_at_k": {"minimum": 0.90},
+    "mean_context_precision": {"minimum": 0.25},
+    "success_rate": {"minimum": 1.0},
+    "latency_ms.p95": {"maximum": 1000.0}
+  },
+  "answer": {
+    "metrics.factual_correctness": {"minimum": 3.0},
+    "metrics.completeness": {"minimum": 3.0},
+    "metrics.faithfulness": {"minimum": 3.5},
+    "metrics.answer_relevance": {"minimum": 3.5},
+    "metrics.claim_citation_support": {"minimum": 0.90},
+    "metrics.abstention_accuracy": {"minimum": 0.90},
+    "metrics.citation_source_accuracy": {"minimum": 0.90},
+    "metrics.success_rate": {"minimum": 0.98},
+    "latency_ms.answer_total.p95": {"maximum": 60000.0}
+  },
+  "grader_calibration": {
+    "overall_mean_absolute_error": {"maximum": 0.75},
+    "within_one_rate": {"minimum": 0.80}
+  }
+}

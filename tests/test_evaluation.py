@@ -10,6 +10,7 @@ def test_retrieval_evaluation_counts_hit_and_miss(tmp_path, capsys):
             "id": "correct-page",
             "question": "First question",
             "answerable": True,
+            "expected_answer": "Expected",
             "relevant_documents": ["sample.pdf"],
             "relevant_pages": [1],
         },
@@ -17,6 +18,7 @@ def test_retrieval_evaluation_counts_hit_and_miss(tmp_path, capsys):
             "id": "wrong-page",
             "question": "Second question",
             "answerable": True,
+            "expected_answer": "Expected",
             "relevant_documents": ["sample.pdf"],
             "relevant_pages": [2],
         },
@@ -24,6 +26,7 @@ def test_retrieval_evaluation_counts_hit_and_miss(tmp_path, capsys):
             "id": "unanswerable",
             "question": "Unsupported question",
             "answerable": False,
+            "expected_answer": "Unsupported",
             "relevant_documents": [],
             "relevant_pages": [],
         },
@@ -80,6 +83,7 @@ def test_no_answerable_cases_returns_unscored_report(tmp_path, capsys):
             "id": "unsupported",
             "question": "A question without supporting evidence",
             "answerable": False,
+            "expected_answer": "Unsupported",
             "relevant_documents": [],
             "relevant_pages": [],
         }
@@ -111,3 +115,25 @@ def test_no_answerable_cases_returns_unscored_report(tmp_path, capsys):
     search.assert_not_called()
 
     assert "No answerable cases to evaluate." in capsys.readouterr().out
+
+
+def test_retrieval_evaluation_captures_case_exception(tmp_path):
+    directory = tmp_path / "evals"
+    directory.mkdir()
+    (directory / "golden_dataset.json").write_text(json.dumps([{
+        "id": "failure", "question": "Question", "answerable": True,
+        "expected_answer": "Answer", "relevant_documents": ["a.md"],
+        "relevant_pages": [None],
+    }]))
+    with (
+        patch.object(runner, "PROJECT_ROOT", tmp_path),
+        patch.object(runner, "search_chunks", side_effect=ConnectionError("offline")),
+        patch.object(
+            runner, "get_settings",
+            return_value=SimpleNamespace(embedding_model="test-model"),
+        ),
+    ):
+        report = runner.run_retrieval_evaluation(top_k=3)
+    assert report["failure_count"] == 1
+    assert report["success_rate"] == 0
+    assert report["cases"][0]["error"]["error_type"] == "ConnectionError"

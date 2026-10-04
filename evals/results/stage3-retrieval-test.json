@@ -1,0 +1,336 @@
+{
+  "report_version": "3.0.0",
+  "top_k": 3,
+  "split": "test",
+  "evaluated": 11,
+  "hits": 11,
+  "hit_rate": 1.0,
+  "skipped_unanswerable": 4,
+  "cases": [
+    {
+      "id": "running-failed-batch",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 185.41983293835074,
+      "retrieved_sources": [
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.38554442790482324
+        },
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.5810501978277569
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5903653760982117
+        }
+      ]
+    },
+    {
+      "id": "payment-owner-and-recovery-validation",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 1.0,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 127.53691605757922,
+      "retrieved_sources": [
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.4466147017663801
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.48982580400293485
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.5249304287237733
+        }
+      ]
+    },
+    {
+      "id": "research-evidence-inference",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 96.85491700656712,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6479510345662978
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.7340648770332336
+        },
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.7661246974616865
+        }
+      ]
+    },
+    {
+      "id": "beginner-mode-jargon",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 98.44700002577156,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.6374102316743266
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.6476968526840186
+        },
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.6888154665891294
+        }
+      ]
+    },
+    {
+      "id": "challenge-hidden-risks",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "latency_ms": 96.51399997528642,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 2,
+          "distance": 0.5694691418677482
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.5764540903703596
+        },
+        {
+          "document": "sample.pdf",
+          "page": 1,
+          "distance": 0.5825028543918458
+        }
+      ]
+    },
+    {
+      "id": "interview-practice-flow",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 2,
+      "reciprocal_rank": 0.5,
+      "latency_ms": 97.25774999242276,
+      "retrieved_sources": [
+        {
+          "document": "sample.pdf",
+          "page": 4,
+          "distance": 0.656766917741386
+        },
+        {
+          "document": "sample.pdf",
+          "page": 3,
+          "distance": 0.682048006546013
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6901321885423052
+        }
+      ]
+    },
+    {
+      "id": "incident-smallest-recovery",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.5,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 93.05262507405132,
+      "retrieved_sources": [
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.4418257377899323
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.6507897301331489
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6514404492736086
+        }
+      ]
+    },
+    {
+      "id": "identity-platform-owner",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.5,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 100.26004095561802,
+      "retrieved_sources": [
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.2520985002282857
+        },
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.46498191356657415
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5874933075165726
+        }
+      ]
+    },
+    {
+      "id": "commander-technical-authority",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 95.4437080072239,
+      "retrieved_sources": [
+        {
+          "document": "service-ownership.md",
+          "page": null,
+          "distance": 0.47034358978269974
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.574550092871464
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.6584448523719704
+        }
+      ]
+    },
+    {
+      "id": "current-retry-delay-paraphrase",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 97.63466601725668,
+      "retrieved_sources": [
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.2842400588416709
+        },
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.5064249000400866
+        },
+        {
+          "document": "payment-incident-runbook.md",
+          "page": null,
+          "distance": 0.6222710867765913
+        }
+      ]
+    },
+    {
+      "id": "adversarial-ignore-retry-policy",
+      "hit": true,
+      "all_relevant_retrieved": true,
+      "source_recall": 1.0,
+      "context_precision": 0.3333333333333333,
+      "first_relevant_rank": 1,
+      "reciprocal_rank": 1.0,
+      "latency_ms": 99.01312494184822,
+      "retrieved_sources": [
+        {
+          "document": "payment-retry-policy-v2.md",
+          "page": null,
+          "distance": 0.523107792775422
+        },
+        {
+          "document": "settlement-runbook.pdf",
+          "page": 1,
+          "distance": 0.5675181086264196
+        },
+        {
+          "document": "dedup_test.pdf",
+          "page": 1,
+          "distance": 0.5781360003149417
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-10-04T03:58:48.671498+00:00",
+  "retriever": "vector",
+  "embedding_model": "embeddinggemma",
+  "dataset_version": "3.1.0",
+  "dataset_sha256": "6283fe9871e21a02bd225bf83a8aa1d939e59fd158949aa5ade4095f05ea81a8",
+  "corpus_version": "stage2-2026-10-03",
+  "corpus_sha256": "9d189cf8792623ab11821c3494e2696aa1e3d95c4ff96970e10e85e3886b7850",
+  "mrr": 0.9090909090909091,
+  "full_coverage_rate": 1.0,
+  "mean_source_recall": 1.0,
+  "recall_at_k": 1.0,
+  "mean_context_precision": 0.4242424242424242,
+  "failure_count": 0,
+  "failures": [],
+  "success_rate": 1.0,
+  "latency_ms": {
+    "min": 93.05262507405132,
+    "mean": 107.94859827199781,
+    "p50": 97.63466601725668,
+    "p95": 127.53691605757922,
+    "p99": 127.53691605757922,
+    "max": 185.41983293835074
+  },
+  "retrieval_config": {
+    "reranker_model": null,
+    "candidate_count": null,
+    "top_k": 3
+  }
+}

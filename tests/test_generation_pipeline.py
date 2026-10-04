@@ -66,3 +66,34 @@ def test_pipeline_abstention_has_no_citations():
         "answer": "The available documents do not contain enough information.",
         "citations": [],
     }
+
+
+def test_pipeline_accepts_concise_citation_free_clarification():
+    with (
+        patch.object(
+            pipeline,
+            "search_chunks",
+            return_value=[{
+                "document": "sample.pdf", "page": 4,
+                "content": "Start with the smallest useful next step.",
+                "distance": 0.2,
+            }],
+        ),
+        patch.object(
+            pipeline,
+            "generate_answer",
+            return_value="What goal or situation do you mean?",
+        ),
+    ):
+        result = pipeline.answer_question("What should I do next?")
+
+    assert result == {
+        "answer": "What goal or situation do you mean?",
+        "citations": [],
+    }
+
+
+def test_clarification_classifier_rejects_factual_statement_followed_by_question():
+    assert pipeline._is_citation_free_clarification(
+        "Start with the smallest useful next step. What is your goal?"
+    ) is False

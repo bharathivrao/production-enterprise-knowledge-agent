@@ -1,0 +1,66 @@
+[
+  {
+    "id": "fully-correct",
+    "question": "How many retries are allowed?",
+    "expected_answer": "Up to two retries.",
+    "actual_answer": "Up to two retries are allowed [S1].",
+    "evidence": "[S1] Current policy: payment submissions may be retried up to two times.",
+    "human_scores": {"factual_correctness": 4, "completeness": 4, "faithfulness": 4, "answer_relevance": 4}
+  },
+  {
+    "id": "correct-but-incomplete",
+    "question": "How many retries and what delay?",
+    "expected_answer": "Two retries with at least 30 seconds between attempts.",
+    "actual_answer": "Two retries are allowed [S1].",
+    "evidence": "[S1] Two retries are allowed, with at least 30 seconds between attempts.",
+    "human_scores": {"factual_correctness": 4, "completeness": 2, "faithfulness": 4, "answer_relevance": 3}
+  },
+  {
+    "id": "unsupported-wrong-number",
+    "question": "How many retries are allowed?",
+    "expected_answer": "Up to two retries.",
+    "actual_answer": "Five retries are allowed [S1].",
+    "evidence": "[S1] Current policy allows up to two retries.",
+    "human_scores": {"factual_correctness": 0, "completeness": 1, "faithfulness": 0, "answer_relevance": 3}
+  },
+  {
+    "id": "correct-abstention",
+    "question": "Who approved the policy?",
+    "expected_answer": "The available documents do not contain enough information.",
+    "actual_answer": "The available documents do not contain enough information.",
+    "evidence": "[S1] The current policy allows two retries.",
+    "human_scores": {"factual_correctness": 4, "completeness": 4, "faithfulness": 4, "answer_relevance": 4}
+  },
+  {
+    "id": "supported-but-irrelevant",
+    "question": "Who owns payments?",
+    "expected_answer": "The Mercury team.",
+    "actual_answer": "The Atlas team owns identity services [S2].",
+    "evidence": "[S1] Mercury owns payments. [S2] Atlas owns identity services.",
+    "human_scores": {"factual_correctness": 0, "completeness": 0, "faithfulness": 4, "answer_relevance": 0}
+  },
+  {
+    "id": "complete-paraphrase",
+    "question": "What are the first incident actions?",
+    "expected_answer": "Page on-call, open a channel, and preserve logs.",
+    "actual_answer": "Responders must alert on-call, create the incident channel, and retain transaction logs [S1].",
+    "evidence": "[S1] Page on-call, open an incident channel, and preserve transaction logs.",
+    "human_scores": {"factual_correctness": 4, "completeness": 4, "faithfulness": 4, "answer_relevance": 4}
+  },
+  {
+    "id": "mixed-supported-invented",
+    "question": "What are the first incident actions?",
+    "expected_answer": "Page on-call and preserve logs.",
+    "actual_answer": "Page on-call and preserve logs [S1]. Email every customer [S1].",
+    "evidence": "[S1] Page on-call and preserve transaction logs.",
+    "human_scores": {"factual_correctness": 2, "completeness": 4, "faithfulness": 2, "answer_relevance": 3}
+  },
+  {
+    "id": "unnecessary-abstention",
+    "question": "Who owns payments?",
+    "expected_answer": "The Mercury team.",
+    "actual_answer": "The available documents do not contain enough information.",
+    "evidence": "[S1] The Mercury team owns payments.",
+    "human_scores": {"factual_correctness": 0, "completeness": 0, "faithfulness": 4, "answer_relevance": 1}
+  }
+]
