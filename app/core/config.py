@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     vector_max_distance: float | None = Field(default=None, ge=0, le=2)
     max_context_tokens: int = Field(default=3500, ge=256)
 
+    workflow_max_steps: int = Field(default=4, ge=2, le=4)
+    workflow_max_model_calls: int = Field(default=6, ge=3, le=10)
+    workflow_max_tokens: int = Field(default=12000, ge=2048)
+    workflow_max_runtime_seconds: int = Field(default=600, ge=30)
+
     chunk_size: int = Field(default=400, ge=1)
     chunk_overlap: int = Field(default=50, ge=0)
     max_upload_bytes: int = Field(default=10 * 1024 * 1024, ge=1)

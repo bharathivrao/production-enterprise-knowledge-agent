@@ -1,0 +1,36 @@
+{
+  "state": "clarification",
+  "answer": "What goal or situation would you like help with?",
+  "citations": [],
+  "trace": [
+    {
+      "state": "received",
+      "elapsed_ms": 0.00900006853044033
+    },
+    {
+      "state": "analyzing",
+      "elapsed_ms": 0.01225003506988287
+    },
+    {
+      "state": "clarification",
+      "elapsed_ms": 900.3929999889806
+    }
+  ],
+  "usage": {
+    "model_calls": 1,
+    "tokens": 149,
+    "elapsed_ms": 900.4269579891115
+  },
+  "metadata": {
+    "goal_prompt_version": "4.0.0",
+    "plan_prompt_version": "4.0.0",
+    "synthesis_prompt_version": "4.0.0",
+    "generation_model": "qwen3:4b",
+    "embedding_model": "embeddinggemma",
+    "retrieval_method": "vector",
+    "max_steps": 4,
+    "max_model_calls": 6,
+    "max_tokens": 12000,
+    "max_runtime_seconds": 600
+  }
+}

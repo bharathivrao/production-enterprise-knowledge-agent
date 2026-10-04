@@ -1,7 +1,14 @@
 from fastapi import APIRouter
 import logging
+import ollama
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
+from app.agents.goal_analyzer import InvalidGoalAnalysis
+from app.agents.planner import InvalidPlan
+from app.agents.synthesizer import InvalidSynthesis
+from app.agents.workflow import (
+    WorkflowBudgetExceeded, WorkflowResult, WorkflowRunError, run_planned_answer,
+)
 from app.generation.pipeline import answer_question
 import httpx
 from fastapi import HTTPException
@@ -33,6 +40,13 @@ class CitationResponse(BaseModel):
 class AnswerResponse(BaseModel):
     answer: str = Field(min_length=1)
     citations: list[CitationResponse]
+
+
+class PlannedAskRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    query: str = Field(min_length=1, max_length=2000)
+    top_k: int = Field(default=3, ge=1, le=3)
 
 @router.post("/search")
 def search(request: SearchRequest):
@@ -106,3 +120,33 @@ def ask(request: SearchRequest):
     except RerankerUnavailableError as error:
         logger.exception("Reranker failed")
         raise HTTPException(503, "The reranker is unavailable. Try again later.") from error
+
+
+@router.post("/ask/planned", response_model=WorkflowResult, response_model_exclude_none=True)
+def ask_planned(request: PlannedAskRequest):
+    try:
+        return run_planned_answer(request.query, top_k=request.top_k)
+    except WorkflowRunError as error:
+        cause = error.cause
+        if isinstance(cause, WorkflowBudgetExceeded):
+            status_code, message = 504, "The planned answer exceeded its budget."
+        elif isinstance(cause, (InvalidGoalAnalysis, InvalidPlan, InvalidSynthesis, CitationValidationError)):
+            status_code, message = 502, "The planned answer failed validation."
+        elif isinstance(cause, (ConnectionError, RerankerUnavailableError)):
+            status_code, message = 503, "A required model service is unavailable."
+        elif isinstance(cause, httpx.TimeoutException):
+            status_code, message = 504, "A model request timed out."
+        elif isinstance(cause, (psycopg.Error, PoolTimeout)):
+            status_code, message = 503, "The database is unavailable."
+        elif isinstance(cause, ollama.ResponseError):
+            status_code, message = 502, "The model service could not complete the request."
+        else:
+            logger.exception("Planned answer failed unexpectedly")
+            status_code, message = 500, "The planned answer could not be completed."
+        raise HTTPException(
+            status_code=status_code,
+            detail={
+                "message": message,
+                "trace": [event.model_dump(exclude_none=True) for event in error.trace],
+            },
+        ) from error

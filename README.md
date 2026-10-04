@@ -2,7 +2,7 @@
 
 A production-oriented knowledge agent that ingests enterprise documents, finds permission-scoped evidence, and answers questions with citations. The project is being built in nine stages, from a transparent RAG pipeline to planning, tools, memory, self-correction, guardrails, and operational deployment.
 
-**Current status:** Stages 1–3 are implemented and pending owner review. Stage 3's held-out evaluation gates pass; on the 15-case test split, answer quality, claim-citation support, answer behavior, and citation-source accuracy each scored 1.0. These are small-corpus local results, not a production-quality guarantee. Stages 4–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the detailed production checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the latest implementation and evaluation handoff.
+**Current status:** Stages 1–4 are implemented pending owner review. Stage 3's held-out evaluation gates pass on a small local corpus, and Stage 4 adds an opt-in bounded, cited planning workflow. This is not a production-quality guarantee; Stages 5–9 remain planned. See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for the checklist and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for the implementation handoff.
 
 ## Original project stages
 
@@ -11,7 +11,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 | 1 | Basic RAG: ingestion, vector storage, retrieval, cited answers | Implemented |
 | 2 | Production retrieval: hybrid search and reranking | Implemented; vector is the measured default |
 | 3 | Evaluation: datasets, metrics, quality gates | Implemented; all acceptance gates pass; pending owner review |
-| 4 | Goal analysis and planning | Planned |
+| 4 | Goal analysis and planning | Implemented; pending owner review |
 | 5 | Tools and MCP | Planned |
 | 6 | Working and conversation memory | Planned |
 | 7 | Self-correction and evidence verification | Planned |
@@ -44,9 +44,11 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 ### Stage 4 — Goal analysis and planning
 
-**Planned:** Turn complex requests into typed objectives, entities, constraints, deliverables, and bounded substeps. Ask for clarification when required information is missing. Execute plans with limits on steps, model calls, tokens, and time.
+**Built:** `POST /ask/planned` and a CLI turn complex requests into typed objectives, entities, constraints, deliverables, and at most three read-only search steps followed by server-owned synthesis. The workflow asks for clarification when intent is too vague, validates model-produced queries and source IDs, and returns a state trace, citations, and usage. The existing `/ask` remains the single-pass path.
 
-**Target demonstration:** Compare retry and dead-letter-queue handling across multiple systems, cite each finding, and identify gaps without making unsupported claims.
+**Measured demonstration:** A local three-document comparison cited the payment incident runbook, service ownership guide, and current retry policy in about 9.3 seconds, using six model calls and 1,287 accounted tokens. A vague request returned clarification without searching. See [planning policy](docs/planning-policy.md) and the saved `evals/results/stage4-*.json` reports. These examples are not a broad quality benchmark; runtime enforcement is cooperative rather than hard cancellation.
+
+**Key learning:** Keep the model's role narrow: it proposes focused queries and evidence-grounded findings, while the server fixes permitted steps, budgets, scope, and citation validation.
 
 ### Stage 5 — Tools
 
@@ -82,7 +84,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 Stages 1–8 describe the learning and feature milestones; Stage 9 covers production packaging and operations. Remaining production work includes:
 
-- Review and accept completed Stage 3; continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
+- Review and accept completed Stage 4; continue growing the evaluation dataset beyond its initial 50 cases without leaking held-out examples.
 - Add CI for tests and evaluation gates; document migrations and rollback.
 - Finish the application container, deployment configuration, secrets handling, structured logs, request tracing, metrics, readiness probes, backups, and recovery procedures.
 - Test realistic load, failure recovery, and access-control boundaries.
@@ -108,9 +110,14 @@ Question ───────────────────┤
                              │
                              ▼
                  Answer with citations or abstain
+
+Complex question → Typed goal → Validated search plan → Scoped evidence
+                                               │
+                                               ▼
+                                  Cited synthesis / clarification
 ```
 
-Stages 4–7 extend this foundation with planning, tools, memory, and bounded evidence checks. Stage 8 applies access and safety controls across the workflow.
+Stage 4 adds the opt-in planning path. Stages 5–7 add tools, memory, and bounded evidence checks. Stage 8 applies access and safety controls across the workflow.
 
 ## Technology
 
@@ -179,6 +186,7 @@ Configuration is documented in [.env.example](.env.example). Do not commit a rea
 - `POST /documents`: upload a PDF, TXT, Markdown, or DOCX document.
 - `POST /search`: retrieve evidence without answer generation.
 - `POST /ask`: answer from retrieved evidence with citations or abstain.
+- `POST /ask/planned`: analyze a goal, run a bounded read-only search plan, and return cited findings or a clarification. Body: `{"query":"...","top_k":3}`; response includes `state`, `answer`, `citations`, `goal`, `plan`, `trace`, `usage`, and `metadata`.
 
 Use the OpenAPI page at `/docs` for request schemas and response examples. Available retrieval settings and filters are defined by the API request model.
 
@@ -206,7 +214,15 @@ uv run python -m app.evaluation.gates --kind answer \
   --report evals/results/answers-test.json
 ```
 
-Additional commands for grader calibration and repeated-run checks are in [evaluation policy](docs/evaluation-policy.md). The current held-out answer gate is known to fail; inspect the report and handoff before treating it as a release check.
+Additional commands for grader calibration and repeated-run checks are in [evaluation policy](docs/evaluation-policy.md). The recorded Stage 3 held-out gates pass on the small local dataset; they are not a release certification.
+
+To run the Stage 4 workflow directly against the ingested sample corpus:
+
+```bash
+uv run python -m app.agents.workflow \
+  "Compare the payment incident runbook, service ownership guide, and current payment retry policy: who responds to a severity-one payment incident, who owns the payments platform, and what retry count and delay apply to payment submissions?" \
+  --output evals/results/stage4-three-source-comparison.json
+```
 
 ## Project documents
 
@@ -215,6 +231,7 @@ Additional commands for grader calibration and repeated-run checks are in [evalu
 - [Ingestion and provenance policy](docs/ingestion-policy.md)
 - [Retrieval and reranking measurements](docs/retrieval-policy.md)
 - [Evaluation methodology and split discipline](docs/evaluation-policy.md)
+- [Stage 4 planning policy and measured examples](docs/planning-policy.md)
 
 ## Scope and limitations
 

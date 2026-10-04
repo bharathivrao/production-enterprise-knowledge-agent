@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stages 1, 2, and 3 are complete pending owner review. The service has reliable multi-format ingestion, permission-aware retrieval, and versioned evaluation with passing held-out quality gates. It is not yet a complete agent or a production-ready enterprise service.
+Current status: Stages 1–4 are implemented pending owner review. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, and an opt-in bounded planning workflow. It is not yet a complete agent or a production-ready enterprise service.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -16,18 +16,18 @@ Status is based on inspected repository code and recorded evaluation results. Em
 
 ### Application and configuration
 
-- FastAPI application with document upload, search, answer, root, health, and liveness endpoints.
+- FastAPI application with document upload, search, single-pass answer, planned answer, root, health, liveness, and dependency-readiness endpoints.
 - Pydantic request validation and structured ingestion/answer responses.
 - Central settings loaded from environment configuration, with the database password represented as a SecretStr.
 - PostgreSQL with pgvector provisioned through Docker Compose.
 - Local Ollama models: embeddinggemma for embeddings and qwen3:4b for answer generation.
 - Shared Ollama client with a five-second connection timeout and 120-second network timeout. This is not a total request deadline.
 
-### PDF ingestion and persistence
+### Multi-format ingestion and persistence
 
-- PyMuPDF parsing with page metadata.
-- Rejection of unreadable, non-PDF, password-protected, empty, and textless PDF content through the implemented validation paths.
-- Token-based chunking with configurable chunk size and overlap; current defaults are 500 tokens and 50 overlap.
+- PDF, UTF-8 TXT, Markdown, and DOCX parsing with page or section metadata.
+- Rejection of unsupported, unreadable, password-protected, empty, and textless content through the implemented validation paths.
+- Token-based chunking with configurable size and overlap.
 - Local 768-dimensional embeddings with truncation disabled.
 - PostgreSQL document/chunk storage, foreign keys, uniqueness constraints, and dimensionality checks.
 - SHA-256 content deduplication, including early reuse and storage-conflict handling.
@@ -38,7 +38,7 @@ Status is based on inspected repository code and recorded evaluation results. Em
 
 - Vector search using pgvector cosine distance.
 - Chunk IDs and source metadata in retrieval results.
-- In-memory BM25 ranking, with shared query/document tokenization and common-word filtering.
+- PostgreSQL full-text ranking, with shared query/document tokenization and common-word filtering.
 - Hybrid retrieval using Reciprocal Rank Fusion and chunk-ID deduplication.
 - Vector retrieval remains the default for /ask; hybrid has not demonstrated an improvement on the measured dataset.
 - Evidence context with source labels such as S1 and S2.
@@ -53,7 +53,7 @@ Status is based on inspected repository code and recorded evaluation results. Em
 - Model timeout: HTTP 504.
 - Ollama response errors: shared HTTP 502 handler.
 - Unit and API tests for ingestion, deduplication, retrieval fusion, citation handling, output cleanup, generation pipeline behavior, evaluation, and dependency failure paths.
-- User-reported passing tests during implementation. This document does not establish a fresh full-suite test result.
+- Stage 4 full local suite: 84 passed, 2 skipped. Real local PostgreSQL/Ollama planned runs also completed; the suite result does not imply production readiness.
 
 ### Evaluation
 
@@ -69,21 +69,35 @@ Status is based on inspected repository code and recorded evaluation results. Em
   are versioned or hashed in reports. Grader calibration, repeatability reports,
   explicit acceptance thresholds, and executable gates are included.
 
+### Goal analysis and planning
+
+- Opt-in `/ask/planned` and CLI workflow with typed goals, deliverables, read-only
+  search steps, server-owned synthesis, clarification, traces, and bounded usage.
+- Model-proposed queries are validated before execution; retrieved evidence is
+  permission-scoped and final citations are checked against source IDs.
+- See `docs/planning-policy.md` and `evals/results/stage4-*.json` for the
+  execution contract, measured examples, and limitations.
+
 ## Recorded results and their limits
 
 | Evaluation | Recorded result |
 |---|---|
-| Vector, expanded retrieval dataset | Hit@3: 100% (11/11); MRR@3: 0.9545 |
-| Hybrid, expanded retrieval dataset | Hit@3: 100% (11/11); MRR@3: 0.9545 |
-| Latest answer evaluation | Abstention checks: 15/15; source-page checks: 15/15 |
+| Stage 2 vector and hybrid comparison | MRR@3: 0.9643 for both on the measured set |
+| Stage 3 held-out retrieval | Hit@3: 1.0; MRR@3: 0.9091; Recall@3: 1.0 |
+| Stage 3 held-out answers | 15/15 completed; configured answer gate passes |
+| Stage 4 planned three-source example | Three named sources cited; six model calls; about 9.3 seconds |
 
-These results describe a small development corpus and a dataset used during prompt tuning. They do not establish general production quality.
+These results describe a small local corpus. Stage 3 held-out cases were kept
+separate from development prompt tuning. They do not establish general
+production quality.
 
-Citation-ID validation proves that cited IDs exist. The answer evaluator checks that cited document/page pairs are allowed for a case. Neither mechanism verifies that every claim follows from the cited passage or that the answer is complete.
+Citation-ID validation proves that cited IDs exist. The answer evaluator scores
+claim support and checks citation sources, but automated grading does not
+prove that every claim follows from its passage or that an answer is complete.
 
 Observed examples demonstrate why this matters: a privacy answer once omitted the instruction to redact; a retry answer lost the qualifier “up to”; an approval answer once inferred authority from investigation responsibility. Later experiments improved several of these behaviors, but factual review remains necessary.
 
-## Nine stages remaining for production completion
+## Nine-stage production roadmap
 
 ### 1. Complete ingestion and service reliability
 
@@ -163,17 +177,24 @@ guarantee; automated grades still require human sampling.
 
 ### 4. Goal analysis and planning
 
-Status: placeholder files only.
+Status: completed October 4, 2026; pending owner review.
 
-- [ ] Define typed goal and plan schemas with objectives, entities, deliverables, constraints, and steps.
-- [ ] Decompose complex questions into bounded subqueries.
-- [ ] Identify questions requiring clarification instead of guessing missing user intent.
-- [ ] Validate model-produced plans and permitted step types.
-- [ ] Execute a workflow with explicit states and observable transitions.
-- [ ] Bound step count, model calls, tokens, and total runtime.
-- [ ] Test comparisons spanning several runbooks or systems.
+- [x] Define typed goal and plan schemas with objectives, entities, deliverables, constraints, and steps.
+- [x] Decompose complex questions into bounded subqueries.
+- [x] Identify questions requiring clarification instead of guessing missing user intent.
+- [x] Validate model-produced plans and permitted step types.
+- [x] Execute a workflow with explicit states and observable transitions.
+- [x] Bound step count, model calls, tokens, and total runtime (cooperative elapsed-time checks; hard cancellation remains future work).
+- [x] Test comparisons spanning several runbooks or systems.
 
 Completion evidence: a complex question yields a valid plan, executes it within limits, and produces a cited answer.
+
+Evidence: 84 unit/API tests passed, 2 opt-in PostgreSQL integration tests
+passed separately. Three real local PostgreSQL/Ollama runs are saved: a two-document
+comparison, a three-document comparison with citations to all three named
+sources, and an underspecified question that returns clarification before
+search. The three-document run stayed within four steps, six model calls,
+1,287 accounted tokens, and about 9.3 seconds. See `docs/planning-policy.md`.
 
 ### 5. Tools and MCP
 
@@ -235,7 +256,8 @@ Completion evidence: adversarial and authorization tests pass, and policy decisi
 
 ### 9. Packaging, observability, deployment, and delivery
 
-Status: database Compose setup exists; README, Dockerfile, and dedicated logging module are empty.
+Status: database Compose setup and README exist; application container,
+deployment automation, and dedicated structured logging remain incomplete.
 
 - [ ] Write a Dockerfile and a reproducible application/database setup with explicit Ollama connectivity.
 - [ ] Document prerequisites, supported Python version, model downloads, environment settings, and startup commands.
