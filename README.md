@@ -16,7 +16,7 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 | 6 | Working and conversation memory | Implemented |
 | 7 | Self-correction and evidence verification | Implemented |
 | 8 | Guardrails and enterprise access controls | Implemented; deployment integration remains |
-| 9 | Packaging, deployment, and operations | Planned |
+| 9 | Packaging, deployment, and operations | Local packaging, migrations, observability, CI, and recovery workflow implemented; deployment remains |
 
 ## Stage details
 
@@ -80,7 +80,9 @@ A production-oriented knowledge agent that ingests enterprise documents, finds p
 
 ### Stage 9 — Packaging and operations
 
-**Planned:** Reproducible application/database setup, CI checks, migrations and recovery procedures, structured logs/tracing/metrics, deployment security, and operational runbooks.
+**Built:** A non-root API image and Compose stack for PostgreSQL, ordered migrations, and the API; explicit host Ollama connectivity; a checksum-tracked transactional migration runner; JSON request logs, request IDs, and authenticated Prometheus metrics; GitHub Actions lint/test/integration/image-build checks; and guarded backup/restore helpers. See the [architecture overview](docs/architecture.md) and [operations guide](docs/operations.md).
+
+**Still deployment-specific:** TLS/ingress, an actual identity-provider integration, secret-manager wiring, distributed rate/concurrency limits, production capacity sizing, and monitored backup scheduling depend on the selected hosting target.
 
 ## Production completion work
 
@@ -136,11 +138,12 @@ Stages 4–7 add planning, read-only tools, sessions, and evidence correction. S
 - PyMuPDF, python-docx, tiktoken
 - Official Python MCP SDK for the local stdio tool adapter
 - PyJWT with cryptography for RS256 access-token validation
+- Prometheus client metrics
 - Docker Compose and pytest
 
 ## Run locally
 
-Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama.
+Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker Compose, and Ollama.
 
 1. Install dependencies and make a local environment file:
 
@@ -154,13 +157,7 @@ Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama
    provider that issues `at+jwt` RS256 access tokens with `tenant_id`, `groups`,
    and `roles` claims. Protected endpoints fail closed without this setup.
 
-2. Start PostgreSQL/pgvector:
-
-   ```bash
-   docker compose up -d db
-   ```
-
-3. Pull the configured Ollama models:
+2. Pull the configured Ollama models and keep Ollama reachable from Docker. On Docker Desktop the default container URL is `http://host.docker.internal:11434`; configure `OLLAMA_HOST_CONTAINER` in `.env` on other hosts.
 
    ```bash
    ollama pull embeddinggemma
@@ -168,41 +165,45 @@ Prerequisites: Python 3.14, [uv](https://docs.astral.sh/uv/), Docker, and Ollama
    ollama pull gemma4:e4b
    ```
 
-   Keep Ollama running and reachable from the application.
-
-4. Start the API:
+3. Build and start PostgreSQL/pgvector, apply migrations, and start the API:
 
    ```bash
+   docker compose up -d --build
+   ```
+
+   Compose waits for PostgreSQL and the one-shot migration job before starting the API. The API and database ports bind to loopback.
+
+4. For host-run development instead, start only the database and run the API locally:
+
+   ```bash
+   docker compose up -d db
+   uv run python -m app.db.migrations
    uv run uvicorn app.main:app --reload
    ```
 
    Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for the interactive API.
 
-5. Run unit/API tests:
+5. Run checks:
 
    ```bash
+   uv run ruff check --select F app tests
    uv run pytest -q
    ```
 
-   PostgreSQL integration tests are opt-in and require the local database:
+   PostgreSQL migrations and integration tests require a running database:
 
    ```bash
-   RUN_POSTGRES_INTEGRATION=1 uv run pytest -q tests/integration
+   env RUN_POSTGRES_INTEGRATION=1 uv run pytest -q tests/integration
    ```
 
-   The Stage 8 default suite passes 144 tests with 4 opt-in skips; all eight
-   PostgreSQL integration tests pass separately. See [security policy](docs/security-policy.md).
+   CI also builds the app image and exercises a backup/restore into a separate disposable database. See the [operations guide](docs/operations.md).
 
-Configuration is documented in [.env.example](.env.example). Do not commit a real `.env`.
-For an existing PostgreSQL volume, apply earlier additive migrations, then the [Stage 8 migration](scripts/migrate_stage8.sql) to bind sessions to subjects. Fresh volumes receive the schema from `scripts/schema.sql`. For the configured local Compose database:
-
-```bash
-docker compose exec -T db psql -v ON_ERROR_STOP=1 -U knowledge_agent -d knowledge_agent -f /dev/stdin < scripts/migrate_stage8.sql
-```
+Configuration is documented in [.env.example](.env.example). Do not commit a real `.env`. Existing databases are upgraded by the Compose migration job before API startup; see [migration and restore behavior](docs/operations.md#database-migrations-and-rollback).
 
 ## API overview
 
 - `GET /health` and `GET /health/liveness`: public shallow service health endpoints. `GET /health/readiness` requires a bearer token.
+- `GET /metrics`: authenticated Prometheus metrics. Send the same `Authorization: Bearer <access token>` header used for API requests.
 - `POST /documents`: upload a PDF, TXT, Markdown, or DOCX document. Requires `document:write`; private to the signed subject by default. Multipart `access_groups` can share to verified groups, with `document:publish` required for `public`.
 - `POST /search`: retrieve evidence without answer generation.
 - `POST /ask`: answer from retrieved evidence with citations or abstain.

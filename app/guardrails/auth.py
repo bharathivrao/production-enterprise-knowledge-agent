@@ -42,8 +42,15 @@ def audit(action: str, decision: str, actor: Actor | None = None) -> None:
     subject_hash = (
         sha256(actor.subject.encode("utf-8")).hexdigest()[:16] if actor else "anonymous"
     )
-    logger.info("security action=%s decision=%s subject_hash=%s tenant=%s",
-                action, decision, subject_hash, actor.tenant_id if actor else "none")
+    logger.info(
+        "security_event",
+        extra={
+            "action": action,
+            "decision": decision,
+            "subject_hash": subject_hash,
+            "tenant": actor.tenant_id if actor else "none",
+        },
+    )
 
 
 @lru_cache(maxsize=8)

@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 import argparse
 from app.retrieval.vector_search import search_chunks
-import hashlib
 from datetime import datetime, timezone
 from app.retrieval.bm25 import search_bm25_baseline, search_keyword
 from app.core.config import get_settings

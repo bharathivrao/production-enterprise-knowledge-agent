@@ -1,21 +1,29 @@
 import logging
 from contextlib import asynccontextmanager
 from threading import BoundedSemaphore, Lock
+from time import perf_counter
+from uuid import UUID, uuid4
 
 import ollama
 import psycopg
 from psycopg_pool import PoolTimeout
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import JSONResponse, Response
+from prometheus_client import CONTENT_TYPE_LATEST
 
 from app.api import health, ingest, query, sessions
 from app.core.config import get_settings
 from app.core.model_client import model_client
 from app.db.database import close_database_pool, start_database_pool
+from app.guardrails.auth import Actor, get_actor
+from app.observability import (
+    REQUESTS, REQUEST_DURATION, configure_logging, metrics_payload, request_id_var,
+)
 from app.retrieval.reranker import close_reranker
 
 
 logger = logging.getLogger(__name__)
+configure_logging()
 
 
 @asynccontextmanager
@@ -79,6 +87,38 @@ async def reject_known_oversized_uploads(request: Request, call_next):
     return await call_next(request)
 
 
+@app.middleware("http")
+async def observe_requests(request: Request, call_next):
+    supplied = request.headers.get("x-request-id", "")
+    try:
+        request_id = str(UUID(supplied))
+    except (ValueError, TypeError, AttributeError):
+        request_id = str(uuid4())
+    token = request_id_var.set(request_id)
+    started = perf_counter()
+    status_code = 500
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        response.headers["X-Request-ID"] = request_id
+        return response
+    finally:
+        duration = perf_counter() - started
+        route = getattr(request.scope.get("route"), "path", "unmatched")
+        REQUESTS.labels(request.method, route, str(status_code)).inc()
+        REQUEST_DURATION.labels(request.method, route).observe(duration)
+        logger.info(
+            "http_request_complete",
+            extra={
+                "request_method": request.method,
+                "request_path": route,
+                "status_code": status_code,
+                "duration_ms": round(duration * 1000, 2),
+            },
+        )
+        request_id_var.reset(token)
+
+
 @app.exception_handler(ollama.ResponseError)
 async def handle_model_response_error(request: Request, error: ollama.ResponseError):
     logger.error("Model service returned an error: status=%s", error.status_code)
@@ -106,3 +146,8 @@ app.include_router(sessions.router)
 @app.get("/")
 async def root():
     return {"message": "Welcome to Enterprise Knowledge Agent"}
+
+
+@app.get("/metrics", include_in_schema=False)
+def metrics(_: Actor = Depends(get_actor)):
+    return Response(metrics_payload(), media_type=CONTENT_TYPE_LATEST)

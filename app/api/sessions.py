@@ -22,6 +22,7 @@ from app.memory.session_workflow import (
 )
 from app.memory.working_memory import InvalidFollowup
 from app.tools.dispatcher import ToolError
+from app.observability import record_workflow_trace
 
 
 logger = logging.getLogger(__name__)
@@ -110,10 +111,13 @@ def ask_in_session(
             session_id, session_token, request.query,
             top_k=request.top_k, scope=actor.scope, subject=actor.subject,
         )
+        record_workflow_trace(result.trace)
         audit("session_ask", "allow", actor)
         return result
     except (SessionNotFound, SessionConflict, SessionBudgetExceeded,
             InvalidFollowup, WorkflowRunError) as error:
+        if isinstance(error, WorkflowRunError):
+            record_workflow_trace(error.trace)
         audit("session_ask", "deny", actor)
         raise _session_error(error) from error
 

@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_PASSWORD: ci-only-password
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5433"
+      POSTGRES_DB: knowledge_agent
+      POSTGRES_USER: knowledge_agent
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: 0.11.3
+          enable-cache: true
+      - name: Install Python and locked dependencies
+        run: |
+          uv python install 3.14
+          uv sync --frozen --all-groups
+      - name: Lint
+        run: uv run ruff check --select F app tests
+      - name: Audit locked dependencies
+        run: uv audit --frozen --preview-features audit
+      - name: Start PostgreSQL with pgvector
+        run: docker compose up -d --wait db
+      - name: Apply schema migrations
+        run: uv run python -m app.db.migrations
+      - name: Run unit and API tests
+        run: uv run pytest -q
+      - name: Run PostgreSQL integration tests
+        env:
+          RUN_POSTGRES_INTEGRATION: "1"
+        run: uv run pytest -q tests/integration
+      - name: Build application image
+        run: docker build --tag knowledge-agent:ci .
+      - name: Verify database backup and isolated restore
+        run: |
+          bash scripts/backup_database.sh "$RUNNER_TEMP/knowledge-agent-ci.dump"
+          docker compose exec -T db createdb -U knowledge_agent knowledge_agent_restore_check
+          bash scripts/restore_database.sh \
+            "$RUNNER_TEMP/knowledge-agent-ci.dump" knowledge_agent_restore_check
+          docker compose exec -T db psql -v ON_ERROR_STOP=1 \
+            -U knowledge_agent -d knowledge_agent_restore_check \
+            -c "SELECT to_regclass('documents'), to_regclass('conversation_sessions')"

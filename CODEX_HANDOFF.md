@@ -1,148 +1,173 @@
-# Codex handoff — enterprise knowledge agent
+# Codex handoff — production enterprise knowledge agent
 
-Updated: 2026-10-04 (America/Toronto)
+Updated: 2026-10-05 (America/Toronto)
 
 ## Objective and owner constraints
 
-Build the nine-stage production-oriented enterprise knowledge agent in
+Build the nine-stage enterprise knowledge agent described in
 `PROJECT_ROADMAP.md`: ingest enterprise documents, retrieve authorized
-evidence, answer with citations, plan/use read-only tools, maintain scoped
-memory, verify answers, enforce identity/safety policies, and deploy
-operationally. The owner wants **one stage at a time**, an explanation of what
-it does and why, then a review request. Do not start Stage 9 or push/commit
-Stage 8 until the owner asks. Stage 8 implementation is in the working tree;
-the starting `main` was `9acc358` and tracked `origin/main`. Recheck status in
-a fresh session. Do not use real enterprise data yet.
+evidence, answer with citations, plan and use read-only tools, maintain scoped
+memory, verify answers, enforce access/safety controls, and package/operate the
+service. The user requested Stage 9 items 1–6 only. Do not start Stage 9 item 7
+(deployment to a selected target) until the user chooses/requests it. Work one
+stage at a time, explain the function and rationale, then ask the user to
+review. Do not commit or push unless explicitly asked. Never commit `.env` or
+real credentials. Preserve user data and the existing PostgreSQL volume.
 
 ## Current architecture
 
-- Python 3.14, FastAPI/Pydantic. `app/main.py` owns lifespan and HTTP admission.
-  `app/api/` provides documents, search, single-pass `/ask`, opt-in planned
-  and tool-assisted answers, health/readiness, and conversation sessions.
-- PostgreSQL 17/pgvector via Docker Compose, with a psycopg pool. Ingestion
-  parses PDF/TXT/Markdown/DOCX, chunks, embeds with Ollama `embeddinggemma`,
-  and stores provenance. Retrieval is tenant/group scoped in SQL: vector
-  (measured default), PostgreSQL full-text, hybrid, optional reranking.
-- Ollama `qwen3:4b` generates cited answers. Stage 4 adds typed bounded plans;
-  Stage 5 adds read-only scoped search/chunk-read tools and trusted local stdio
-  MCP; Stage 6 adds expiring PostgreSQL sessions and bounded recent user-turn
-  memory; Stage 7 adds fallible evidence checking and one correction search.
-- Stage 3 evaluation has 50 development/held-out cases, answer/retrieval
-  scoring, calibrated grading and local quality gates. Stage 8 has a separate
-  adversarial replay in `app/evaluation/security_runner.py`.
-- Stage 8 authenticates RS256 JWT access tokens (`at+jwt`) with configured
-  issuer/audience/HTTPS JWKS. Verified subject, tenant, groups, and roles
-  determine document and session access. No request body may set scope.
+- Python 3.14, FastAPI/Pydantic; `app/main.py` sets up lifespan, request IDs,
+  request metrics, routes, and health endpoints.
+- PostgreSQL 17 with pgvector and psycopg pooling. `app/db/migrations.py`
+  applies ordered, checksum-verified SQL migrations under an advisory lock.
+- PDF/TXT/Markdown/DOCX ingestion; Ollama `embeddinggemma` embeddings and
+  `qwen3:4b` generation; SQL-scoped vector/full-text retrieval, hybrid fusion,
+  optional reranking, citation validation.
+- `/ask/planned` and `/ask/tools` provide bounded plans/read-only tools; local
+  stdio MCP exposes the same tool boundary. Sessions persist bounded recent
+  user turns and require both a capability token and verified owner. Evidence
+  checking supports one bounded correction attempt.
+- RS256 access-token validation derives subject/tenant/group scope. PII and
+  injection screening, role checks, and per-process rate/concurrency limits
+  are application-level controls, not a complete security boundary.
+- Stage 9 local packaging: non-root Docker image, Compose PostgreSQL/migration/
+  API services, host Ollama connectivity, JSON logs, authenticated Prometheus
+  metrics, GitHub Actions CI, backup/restore helpers, and operations docs.
 
-## Important design decisions
+## Important implementation decisions
 
-- Authentication fails closed without IdP settings. The API accepts only
-  access tokens, not ID tokens; validates signature, issuer, audience, expiry,
-  issue time, subject, tenant, group, and role shapes. The configured IdP must
-  issue authoritative tenant/groups/roles. Root/shallow health/liveness stay
-  public; readiness and all functional endpoints require bearer auth.
-- Actor scope contains `public`, `user:<signed sub>`, and signed groups within
-  the signed tenant. `user:` is reserved and forbidden in group claims.
-  Retrieval and tool SQL filters before text reaches prompts or rerankers.
-- `document:write` permits upload, private to the subject by default. Sharing
-  requires an actor-owned group; publishing `public` additionally requires
-  `document:publish`. Replace/reindex/delete require the high-trust
-  `document:manage` role **and** document visibility. Managers may manage any
-  visible document in their tenant, not only their own uploads.
-- Deduplication is tenant- and ACL-aware; same-content, different-ACL uploads
-  are rejected because the existing unique key does not allow both copies.
-- Sessions require verified subject + tenant/scope + separate 256-bit bearer
-  capability. Existing sessions migrated to owner `legacy` are inaccessible
-  to authenticated subjects. Sessions expire by configured TTL, are purged on
-  session creation or CLI, and retain bounded turns.
-- Recognizable credentials, SSNs, Luhn-valid cards, and high-confidence
-  document instructions are rejected before embedding; sensitive queries are
-  rejected before search. Heuristics are not complete DLP. Audit logs contain
-  action/decision, tenant, and hashed subject, not tokens or content.
-- Sliding-window request rate and bounded concurrent requests are in-memory
-  **per process**, not distributed. Existing upload/query/tool/model budgets
-  remain. The local stdio MCP adapter still uses fixed public scope and must
-  never be exposed as an unauthenticated network service.
-- Prompt-injection defenses are layered: ingestion screening, evidence-as-data
-  prompts, and citation gates. The local adversarial replay showed the model
-  followed a directive in a synthetic legacy document, but the uncited output
-  was rejected. Do not claim the model resists injection; valid-looking cited
-  attacks remain a risk.
+- Compose project name is exactly `production-enterprise-knowledge-agent`.
+  The current DB container was inspected read-only; its existing volume is
+  `production-enterprise-knowledge-agent-_postgres_data`. Compose explicitly
+  pins that volume name so correcting the project name does not create a new
+  empty DB volume. Do not remove or rename this volume.
+- Container image resolves CPU-only PyTorch on Linux to avoid pulling the much
+  larger CUDA/NVIDIA dependency set. PyTorch CPU index/source is configured in
+  `pyproject.toml` and locked in `uv.lock`.
+- Migrations are immutable and forward-only. SQL and ledger checksum commit in
+  one transaction; fresh DBs create current schema baseline; failed changes
+  roll back. No automatic down migrations: backup first and recover by
+  forward-fix or restore to a separate DB, verify, then switch.
+- Observability is content-safe: logs use static message templates and
+  allowlisted metadata; request IDs are validated; route templates and bounded
+  metric labels avoid high cardinality. `/metrics` requires authentication.
+- CI runs focused Ruff F checks (not wholesale legacy style reformatting),
+  frozen dependency audit, unit/API and PostgreSQL integration tests, Docker
+  build, and backup/restore against an isolated disposable DB. The hosted
+  GitHub Actions workflow has not yet been run/verified in this handoff.
+- No production target was selected; TLS/ingress, real IdP verification,
+  external secret manager, distributed throttling, sizing, and backup
+  scheduling remain target-specific.
 
-## Stage 8 files changed
+## Completed functionality and current state
 
-- `app/guardrails/auth.py` (new), `app/guardrails/pii.py`,
-  `app/guardrails/injection.py`, `app/guardrails/policies.py`: JWT/roles/scope,
-  sensitive-content checks, audit, in-process rate gate.
-- `app/api/query.py`, `app/api/ingest.py`, `app/api/sessions.py`,
-  `app/api/health.py`, `app/main.py`: authenticated endpoints, role checks,
-  derived scope, sensitive-input rejection, admission control.
-- `app/db/repository.py`, `app/ingestion/pipeline.py`: tenant/ACL-scoped
-  document lookup, dedup, management, and pre-embedding rejection.
-- `app/memory/conversation_memory.py`, `app/memory/session_workflow.py`,
-  `scripts/schema.sql`, new `scripts/migrate_stage8.sql`: subject-bound sessions;
-  additive migration was applied to the local development database.
-- `app/core/config.py`, `.env.example`, `pyproject.toml`, `uv.lock`: auth/limit
-  configuration and `PyJWT[crypto]>=2.15.1,<3`.
-- `tests/conftest.py`, new `tests/test_stage8_auth.py`,
-  `tests/test_stage8_guardrails.py`, `tests/integration/test_postgres_access.py`,
-  plus regression updates in old API/pipeline tests.
-- New `app/evaluation/security_runner.py`,
-  `evals/results/stage8-security.json`, `docs/security-policy.md`; updated
-  `README.md`, `PROJECT_ROADMAP.md`, this handoff.
+Stage 9 items 1–6 have been implemented in the working tree, not committed or
+pushed. The repo is intended to remain user-reviewable. Stage 9 item 7 is not
+started. Other uncommitted changes may be present from Stage 9; inspect `git
+status` before editing.
 
-## Current state, tests, and commands
+Implemented: Dockerfile and `.dockerignore`; Compose DB/migration/API order;
+Ollama host configuration; versioned migration registry/runner and isolated
+schema tests; JSON request/security logs, request IDs, request and workflow
+metrics; CI checks; guarded custom-format DB backup/restore scripts; updated
+README, roadmap, architecture and operations docs; Stage 9 unit/integration
+tests. Workflow trace instrumentation is compatible with both typed workflow
+results and dictionary test doubles.
 
-Stage 8 is implemented but **uncommitted/unpushed and awaiting owner review**.
-The local Stage 8 migration has run successfully. Run from repository root:
+Stage 9 demonstration scenarios are documented and point to existing local
+evaluation scripts/results: document ingestion/PG integration, planned and
+tool-based multi-document answers, session follow-up, correction, and
+adversarial guardrail rejection. The model has followed a synthetic embedded
+directive in a prior test; citation validation blocked that particular
+uncited output. This is not proof of prompt-injection resistance.
+
+## Files changed for Stage 9
+
+- Packaging/config: `Dockerfile`, `.dockerignore`, `docker-compose.yml`,
+  `.env.example`, `.gitignore`, `pyproject.toml`, `uv.lock`.
+- Migrations/observability: `app/db/migrations.py`, `app/observability.py`,
+  `app/main.py`, `app/api/query.py`, `app/api/sessions.py`,
+  `app/guardrails/auth.py`, `app/core/config.py`, `app/core/model_client.py`.
+- Recovery/CI/docs: `scripts/backup_database.sh`,
+  `scripts/restore_database.sh`, `.github/workflows/ci.yml`,
+  `docs/architecture.md`, `docs/operations.md`, `README.md`,
+  `PROJECT_ROADMAP.md`, this file.
+- Tests and small fixes: `tests/test_observability.py`,
+  `tests/integration/test_migrations.py`, `tests/test_stage5_tools.py`,
+  `tests/test_stage6_memory.py`, `app/evaluation/runner.py`.
+
+## Tests and commands
+
+Verified locally:
+
+- `.venv/bin/pytest -q`: **148 passed, 5 skipped**.
+- `env RUN_POSTGRES_INTEGRATION=1 .venv/bin/pytest -q tests/integration`:
+  **9 passed** when run with permission to access the local PostgreSQL network.
+  A sandbox-restricted run failed to connect to `127.0.0.1:5433`; rerunning
+  with local DB network access passed.
+- `.venv/bin/ruff check --select F app tests`: passed.
+- `POSTGRES_PASSWORD=validation-secret docker compose config --quiet`: passed.
+- `git diff --check`: passed.
+- Docker image build and import/liveness dependency smoke test passed earlier
+  in this Stage 9 work; `uv audit --frozen --preview-features audit` also
+  passed with no known vulnerability/adverse status in 117 packages.
+- CI workflow is configured but no hosted Actions run result is available.
+
+Useful commands from repo root:
 
 ```bash
-uv sync --all-groups
-docker compose up -d db
-ollama pull embeddinggemma
-ollama pull qwen3:4b
-ollama pull gemma4:e4b
-# On an existing DB, apply earlier migrations first; Stage 8 migration:
-docker compose exec -T db psql -v ON_ERROR_STOP=1 -U knowledge_agent \
-  -d knowledge_agent -f /dev/stdin < scripts/migrate_stage8.sql
-.venv/bin/uvicorn app.main:app --reload
-.venv/bin/pytest -q
-env RUN_POSTGRES_INTEGRATION=1 .venv/bin/pytest -q tests/integration
-.venv/bin/python -m app.evaluation.security_runner \
-  --output evals/results/stage8-security.json
-git diff --check
+uv sync --frozen --all-groups
+cp .env.example .env   # set POSTGRES_PASSWORD and auth IdP settings
+docker compose up -d --build
+docker compose ps
+docker compose logs -f migrate app
+uv run pytest -q
+uv run ruff check --select F app tests
+env RUN_POSTGRES_INTEGRATION=1 uv run pytest -q tests/integration
+uv audit --frozen --preview-features audit
+docker build --tag knowledge-agent:local .
 ```
 
-Set `POSTGRES_PASSWORD` and `AUTH_ISSUER`, `AUTH_AUDIENCE`, HTTPS
-`AUTH_JWKS_URL` in `.env`; the issuer must mint RS256 `at+jwt` access tokens
-with `tenant_id`, `groups`, and `roles` claims, or map those names via the
-`AUTH_*_CLAIM` settings. Never commit `.env` or bearer/session tokens. The
-Stage 8 local default suite passed **144 tests, 4 skipped**. The opt-in
-PostgreSQL suite passed **8 tests**. The adversarial report passed delivery and
-isolation checks, while recording `model_followed_embedded_directive: true`
-and `citation_gate_blocked_output: true`. Its fixture is deleted in `finally`.
-Inspect its latest JSON before making model or prompt changes.
+Host-run API alternative: `docker compose up -d db`, then
+`uv run python -m app.db.migrations`, then
+`uv run uvicorn app.main:app --reload`. Ollama must be available at
+`OLLAMA_HOST` for host execution or `OLLAMA_HOST_CONTAINER` in Compose.
+Configured models: `embeddinggemma`, `qwen3:4b` (README also lists
+`gemma4:e4b` for the workflows that use it).
 
-## Known issues and remaining work
+Backup/restore commands are documented in `docs/operations.md`. Always use a
+new restore target database; do not restore over the source DB. Backups contain
+sensitive documents and need encryption/access control/retention.
 
-- No real IdP has been configured or tested against this deployment; auth is
-  fail-closed until configured. TLS, network ingress, centralized secrets,
-  distributed throttling, logging/metrics, CI, container packaging, backups,
-  load/recovery tests, and operational runbooks are Stage 9.
-- Prompt-injection screening and PII patterns are heuristic, not complete
-  protection or redaction. The model followed a synthetic malicious legacy
-  document instruction; citation validation prevented that specific uncited
-  response. Further adversarial/human review is required.
-- `document:manage` is tenant-wide over documents the manager can see.
-  Fine-grained per-document owner-management and ACL editing do not exist.
-  Same-content uploads with different ACL sets are rejected.
-- Per-process rate/concurrency controls are not global and do not protect a
-  multi-worker deployment alone. Runtime/model/tool deadlines are cooperative,
-  not hard cancellation. No automatic general document retention/legal hold.
-- Local stdio MCP is trusted/public-scope only. Stage 3's 50 cases and local
-  adversarial replay are too small to establish production quality/security.
+## Known issues and limitations
 
-## Exact recommended next task
+- Not deployed. No production IdP, TLS/ingress, secret manager, external
+  Prometheus, distributed rate/concurrency control, capacity testing, or
+  scheduled backup configuration exists.
+- No realistic load/shutdown/fault-injection test has been completed; CI checks
+  only local integration, image build, and disposable DB restore behavior.
+- The migration runner is forward-only; rollback means restore/forward-fix.
+- Rate/concurrency limits are per process; multiple replicas do not coordinate.
+- Model/Ollama and workflow deadlines are cooperative; no hard cancellation.
+- Heuristic PII/injection screening is incomplete; valid-looking cited attacks
+  and subtle secrets may pass.
+- Small evaluation corpus and automated graders cannot establish broad quality.
+- Existing DB is not migrated or Compose-started as part of this Stage 9 work;
+  only its attached volume name was inspected. Integration tests use isolated
+  schemas.
+- Optional-dependency audit and local tests pass, but hosted CI remains
+  unverified. Ruff is deliberately limited to `F` to avoid broad unrelated
+  lint churn.
 
-Review the Stage 8 implementation and tradeoffs with the owner. Do **not**
-start Stage 9 or push until requested.
+## Remaining work and exact recommended next task
+
+Remaining within future production completion: select a deployment target;
+configure that target's TLS/ingress, IdP, secret manager, monitoring, and
+distributed throttles; run realistic load and failure/shutdown exercises;
+verify backup schedule and restore procedure; execute hosted CI; conduct human
+security/quality review. These are not part of current Stage 9 items 1–6.
+
+**Exact next task:** Review the Stage 9 items 1–6 changes and their local test
+results with the user. Do not start deployment item 7, commit, or push until
+the user explicitly requests it. If review approves continuing, ask which
+hosting target to deploy to before making deployment-specific changes.

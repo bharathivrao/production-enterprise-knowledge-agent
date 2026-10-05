@@ -1,6 +1,8 @@
 import httpx
 import ollama
 
+from app.core.config import get_settings
+
 
 class SharedModelClient:
     """A lifecycle-managed proxy around the synchronous Ollama client."""
@@ -11,6 +13,7 @@ class SharedModelClient:
     def start(self) -> None:
         if self._client is None:
             self._client = ollama.Client(
+                host=get_settings().ollama_host,
                 timeout=httpx.Timeout(120.0, connect=5.0),
             )
 
@@ -28,8 +31,6 @@ model_client = SharedModelClient()
 
 
 def model_ready() -> bool:
-    from app.core.config import get_settings
-
     response = model_client.list()
     installed = {
         name

@@ -10,6 +10,7 @@ dependencies = [
     "ollama>=0.6.3",
     "openai>=3.22.1",
     "pgvector>=0.5.0",
+    "prometheus-client>=0.26.0",
     "psycopg-pool>=3.2.0",
     "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.15.0",
@@ -21,12 +22,22 @@ dependencies = [
     "rank-bm25>=0.2.2",
     "sentence-transformers>=5.2.0",
     "tiktoken>=0.14.0",
+    "torch>=2.10.0",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "ruff>=0.16.10",
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu", marker = "sys_platform == 'linux'" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

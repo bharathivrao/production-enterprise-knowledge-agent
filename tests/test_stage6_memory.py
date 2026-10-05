@@ -6,7 +6,7 @@ import pytest
 
 from app.memory.conversation_memory import StoredTurn
 from app.memory.working_memory import (
-    FollowupResolution, InvalidFollowup, WorkingMemory, select_history,
+    FollowupResolution, InvalidFollowup, select_history,
 )
 
 

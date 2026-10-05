@@ -25,6 +25,7 @@ from app.retrieval.vector_search import search_chunks
 from app.retrieval.bm25 import search_keyword
 from app.retrieval.hybrid import search_hybrid
 from app.retrieval.reranker import RerankerUnavailableError, search_reranked
+from app.observability import record_workflow_trace
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["retrieval"])
@@ -151,8 +152,13 @@ def _answer_workflow(request: PlannedAskRequest, runner, actor: Actor):
         raise HTTPException(422, "Do not submit sensitive values in queries.")
     audit("ask_workflow", "allow", actor)
     try:
-        return runner(request.query, top_k=request.top_k, scope=actor.scope)
+        result = runner(request.query, top_k=request.top_k, scope=actor.scope)
+        record_workflow_trace(
+            result.get("trace", []) if isinstance(result, dict) else result.trace
+        )
+        return result
     except WorkflowRunError as error:
+        record_workflow_trace(error.trace)
         cause = error.cause
         if isinstance(cause, WorkflowBudgetExceeded):
             status_code, message = 504, "The planned answer exceeded its budget."

@@ -8,7 +8,7 @@ This document records the implemented system and the work remaining to complete 
 
 The target system accepts enterprise documents, answers questions with supporting evidence, decomposes complex tasks, uses tools, maintains memory, checks its work, and enforces access and safety policies.
 
-Current status: Stages 1–8 are implemented. The service has multi-format ingestion, scoped retrieval, versioned evaluation with passing held-out quality gates, bounded planning, read-only tools, subject-bound sessions, evidence checking/correction, and application-level identity/access guardrails. Stage 9 remains; this is not yet a production-ready enterprise service.
+Current status: Stages 1–8 are implemented. Stage 9 items 1–6 have been implemented locally: reproducible container setup, versioned migrations, observability, CI, recovery workflows, and operations/end-to-end documentation. Stage 9 item 7 (deployment to a selected target) remains. This is not yet a production-ready enterprise service; deployment infrastructure and production acceptance are not established.
 
 Status is based on inspected repository code and recorded evaluation results. Empty placeholder files do not count as implemented features. Checklists below are completion targets, not claims that the features already exist.
 
@@ -298,21 +298,20 @@ Completion evidence: 144 default tests pass, with 4 opt-in skips; all 8 real Pos
 
 ### 9. Packaging, observability, deployment, and delivery
 
-Status: database Compose setup and README exist; application container,
-deployment automation, and dedicated structured logging remain incomplete.
+Status: items 1–6 implemented locally; deployment remains unselected and incomplete.
 
-- [ ] Write a Dockerfile and a reproducible application/database setup with explicit Ollama connectivity.
-- [ ] Document prerequisites, supported Python version, model downloads, environment settings, and startup commands.
-- [ ] Provide an example configuration without real secrets.
-- [ ] Add versioned database migrations with a tested upgrade/rollback strategy.
-- [ ] Add structured logs, request IDs, workflow traces, and metrics for latency/errors/retries.
-- [ ] Set up CI for tests, linting, and appropriate dependency/security checks.
+- [x] Write a non-root Dockerfile and reproducible application/database setup with explicit Ollama connectivity.
+- [x] Document prerequisites, supported Python version, model downloads, environment settings, and startup commands.
+- [x] Provide an example configuration without real secrets.
+- [x] Add checksum-tracked versioned database migrations, transactional failure handling, and a documented forward-recovery strategy.
+- [x] Add structured logs, request IDs, workflow traces, and metrics for request/workflow latency and outcomes.
+- [x] Set up CI for tests, linting, dependency auditing, PostgreSQL integration, image build, and isolated backup/restore checks.
 - [ ] Deploy to the selected target with TLS, protected credentials, and readiness probes.
-- [ ] Test backups/restores, load limits, graceful shutdown, and operational recovery.
-- [ ] Write an architecture overview, API examples, evaluation results, known limitations, and an operations runbook.
-- [ ] Demonstrate ingestion, multi-document planning/tool use, memory, correction, abstention, and guardrail rejection end to end.
+- [x] Add guarded backup/restore helpers and document load limits, graceful shutdown, and operational recovery behavior.
+- [x] Write an architecture overview, API examples, evaluation pointers, known limitations, and an operations runbook.
+- [x] Document reproducible end-to-end demonstrations for ingestion, multi-document planning/tool use, memory, correction, and guardrail rejection.
 
-Completion evidence: another developer can set up and run the project from documentation; the deployed service is observable and recoverable.
+Completion evidence for local Stage 9 items 1–6: another developer can set up the containerized service from documentation; migrations, observability, CI checks, and recovery procedures are implemented. Item 7 still requires a target decision and deployment-specific validation. CI is configured but requires a GitHub run for hosted confirmation; load testing against a production-sized workload and scheduled backups remain outstanding.
 
 ## Implementation sequence
 
