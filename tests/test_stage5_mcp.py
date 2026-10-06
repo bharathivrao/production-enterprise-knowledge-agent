@@ -45,6 +45,9 @@ def test_stdio_mcp_boundary_lists_tools_and_rejects_bad_arguments():
         server = StdioServerParameters(
             command=sys.executable, args=["-m", "app.tools.mcp_server"],
             cwd=str(Path(__file__).resolve().parents[1]),
+            # The SDK forwards only a small allowlist of parent environment
+            # variables. CI has no .env, so supply the required test setting.
+            env={"POSTGRES_PASSWORD": "mcp-test-only"},
         )
         async with stdio_client(server) as (reader, writer):
             async with ClientSession(reader, writer) as session:
